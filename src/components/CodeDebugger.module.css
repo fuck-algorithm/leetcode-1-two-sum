@@ -1,0 +1,130 @@
+.container {
+  background: #1e1e1e;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.875rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 8px 12px;
+  background: #2d2d44;
+  color: #888;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.codeArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.line {
+  display: flex;
+  align-items: flex-start;
+  padding: 2px 12px;
+  min-height: 24px;
+  transition: background 0.2s;
+}
+
+.currentLine {
+  background: rgba(255, 235, 59, 0.15);
+  border-left: 3px solid #ffeb3b;
+  padding-left: 9px;
+}
+
+.lineNumber {
+  color: #666;
+  min-width: 30px;
+  text-align: right;
+  margin-right: 16px;
+  user-select: none;
+}
+
+.lineContent {
+  flex: 1;
+  white-space: pre;
+  color: #d4d4d4;
+}
+
+.variables {
+  display: flex;
+  gap: 8px;
+  margin-left: 16px;
+}
+
+.variable {
+  padding: 2px 8px;
+  background: rgba(76, 175, 80, 0.2);
+  border: 1px solid #4caf50;
+  border-radius: 4px;
+  color: #81c784;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* Prism.js 主题覆盖 */
+.codeArea code[class*="language-"],
+.codeArea pre[class*="language-"] {
+  color: #d4d4d4;
+  background: none;
+  text-shadow: none;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.codeArea .token.comment,
+.codeArea .token.prolog,
+.codeArea .token.doctype,
+.codeArea .token.cdata {
+  color: #6a9955;
+}
+
+.codeArea .token.punctuation {
+  color: #d4d4d4;
+}
+
+.codeArea .token.property,
+.codeArea .token.tag,
+.codeArea .token.boolean,
+.codeArea .token.number,
+.codeArea .token.constant,
+.codeArea .token.symbol {
+  color: #b5cea8;
+}
+
+.codeArea .token.selector,
+.codeArea .token.attr-name,
+.codeArea .token.string,
+.codeArea .token.char,
+.codeArea .token.builtin {
+  color: #ce9178;
+}
+
+.codeArea .token.operator,
+.codeArea .token.entity,
+.codeArea .token.url,
+.codeArea .token.variable {
+  color: #d4d4d4;
+}
+
+.codeArea .token.atrule,
+.codeArea .token.attr-value,
+.codeArea .token.function,
+.codeArea .token.class-name {
+  color: #dcdcaa;
+}
+
+.codeArea .token.keyword {
+  color: #569cd6;
+}
+
+.codeArea .token.regex,
+.codeArea .token.important {
+  color: #d16969;
+}

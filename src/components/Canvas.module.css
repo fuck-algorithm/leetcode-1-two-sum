@@ -1,0 +1,112 @@
+.container {
+  background: #0f0f23;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  padding: 8px 12px;
+  background: #2d2d44;
+  color: #888;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.svg {
+  flex: 1;
+  width: 100%;
+  cursor: grab;
+}
+
+.svg:active {
+  cursor: grabbing;
+}
+
+.sectionTitle {
+  fill: #888;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cell {
+  fill: #2d2d44;
+  stroke: #3d3d5c;
+  stroke-width: 2;
+  transition: all 0.3s ease;
+}
+
+.highlighted {
+  fill: #4caf50;
+  stroke: #81c784;
+}
+
+.cellValue {
+  fill: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.cellIndex {
+  fill: #666;
+  font-size: 11px;
+  text-anchor: middle;
+}
+
+.annotation {
+  fill: #ffeb3b;
+  font-size: 11px;
+  text-anchor: middle;
+  font-weight: 500;
+}
+
+.hashCell {
+  fill: #1a237e;
+  stroke: #3949ab;
+  stroke-width: 2;
+  transition: all 0.3s ease;
+}
+
+.newEntry {
+  fill: #4caf50;
+  stroke: #81c784;
+}
+
+.hashKey {
+  fill: #90caf9;
+  font-size: 14px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+.hashDivider {
+  stroke: #3949ab;
+  stroke-width: 1;
+}
+
+.hashValue {
+  fill: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+.emptyText {
+  fill: #666;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.description {
+  padding: 12px 16px;
+  background: #16213e;
+  color: #ccc;
+  font-size: 0.875rem;
+  border-top: 1px solid #2d2d44;
+  min-height: 44px;
+}

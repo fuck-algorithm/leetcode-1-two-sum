@@ -1,0 +1,29 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #1a1a2e;
+  border-bottom: 1px solid #2d2d44;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.title:hover {
+  color: #4fc3f7;
+}
+
+.github {
+  color: #888;
+  transition: color 0.2s;
+}
+
+.github:hover {
+  color: #fff;
+}

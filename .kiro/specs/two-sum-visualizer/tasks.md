@@ -1,0 +1,159 @@
+# Implementation Plan
+
+- [x] 1. 项目初始化和基础配置
+  - [x] 1.1 使用Vite创建React+TypeScript项目
+    - 初始化项目结构
+    - 配置TypeScript
+    - 安装依赖：react, react-dom, d3, prismjs, fast-check, vitest
+    - _Requirements: 9.3_
+  - [x] 1.2 配置ESLint和Prettier
+    - 添加ESLint配置
+    - 添加Prettier配置
+    - 确保无linter错误
+    - _Requirements: 9.3_
+  - [x] 1.3 创建GitHub Actions部署配置
+    - 创建.github/workflows/deploy.yml
+    - 配置自动构建和部署到GitHub Pages
+    - _Requirements: 9.1, 9.2_
+
+- [x] 2. 核心数据模型和工具函数
+  - [x] 2.1 创建类型定义文件
+    - 定义Step、InputData、VariableState等接口
+    - 定义组件Props类型
+    - _Requirements: 6.1, 6.2, 6.3_
+  - [x] 2.2 实现数据验证函数
+    - 实现validateInput函数
+    - 验证数组长度、元素范围、有效解存在性
+    - _Requirements: 7.5, 7.6_
+  - [x] 2.3 编写数据验证属性测试
+    - **Property 7: 数据验证正确性**
+    - **Validates: Requirements 7.5, 7.6**
+  - [x] 2.4 实现随机数据生成函数
+    - 实现generateRandomData函数
+    - 确保生成的数据合法且有解
+    - _Requirements: 7.4_
+  - [x] 2.5 编写随机数据生成属性测试
+    - **Property 6: 随机数据合法性**
+    - **Validates: Requirements 7.4**
+  - [x] 2.6 实现算法步骤生成器
+    - 实现generateSteps函数
+    - 生成包含变量状态、高亮行、HashMap状态的完整步骤序列
+    - _Requirements: 6.1, 6.2, 6.3, 6.5_
+  - [x] 2.7 编写算法步骤生成属性测试
+    - **Property 8: 算法步骤生成正确性**
+    - **Validates: Requirements 6.1, 6.2, 6.3**
+
+- [x] 3. Checkpoint - 确保所有测试通过
+  - 确保所有测试通过，如有问题请询问用户
+
+- [x] 4. 状态管理Hook
+  - [x] 4.1 实现useAlgorithmPlayer Hook
+    - 管理currentStepIndex、isPlaying状态
+    - 实现next、prev、play、pause、reset、seek方法
+    - 实现键盘快捷键监听
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
+  - [x] 4.2 编写步骤导航属性测试
+    - **Property 1: 步骤导航一致性**
+    - **Validates: Requirements 2.1, 2.2**
+  - [x] 4.3 编写重置状态属性测试
+    - **Property 2: 重置状态一致性**
+    - **Validates: Requirements 2.5**
+  - [x] 4.4 编写进度条跳转属性测试
+    - **Property 3: 进度条跳转一致性**
+    - **Validates: Requirements 3.2**
+
+- [x] 5. Checkpoint - 确保所有测试通过
+  - 确保所有测试通过，如有问题请询问用户
+
+- [x] 6. UI组件实现
+  - [x] 6.1 实现Header组件
+    - 显示标题"1. 两数之和"，可点击跳转LeetCode
+    - 右上角显示GitHub图标，可点击跳转仓库
+    - 创建Header.tsx和Header.module.css
+    - _Requirements: 1.1, 1.2, 1.3, 1.4_
+  - [x] 6.2 实现DataInput组件
+    - 输入框接受数组和目标值
+    - 平铺展示预设样例按钮
+    - 随机生成按钮
+    - 提交按钮和错误提示
+    - 创建DataInput.tsx和DataInput.module.css
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
+  - [x] 6.3 实现ControlPanel组件
+    - 重置、上一步、播放/暂停、下一步按钮
+    - 按钮上显示快捷键提示
+    - 可拖动进度条（绿色已播放，灰色未播放）
+    - 创建ControlPanel.tsx和ControlPanel.module.css
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 3.1, 3.2, 3.3_
+  - [x] 6.4 实现CodeDebugger组件
+    - 显示Java代码带行号
+    - 语法高亮（使用Prism.js）
+    - 高亮当前执行行
+    - 在变量所在行后显示变量值
+    - 创建CodeDebugger.tsx和CodeDebugger.module.css
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
+  - [x] 6.5 编写代码调试器状态属性测试
+    - **Property 4: 代码调试器状态一致性**
+    - **Validates: Requirements 4.1, 4.2**
+
+- [x] 7. Checkpoint - 确保所有测试通过
+  - 确保所有测试通过，如有问题请询问用户
+
+- [x] 8. Canvas画布实现
+  - [x] 8.1 实现Canvas组件基础结构
+    - 使用D3.js创建SVG画布
+    - 实现拖动平移功能
+    - 实现滚轮缩放功能
+    - 创建Canvas.tsx和Canvas.module.css
+    - _Requirements: 5.1, 5.2, 5.3_
+  - [x] 8.2 实现数组可视化
+    - 绘制数组元素方块
+    - 显示元素值和下标
+    - 高亮当前操作元素
+    - 显示元素旁的文字说明
+    - _Requirements: 6.1, 6.2, 6.5_
+  - [x] 8.3 实现HashMap可视化
+    - 绘制HashMap键值对
+    - 高亮新增的键值对
+    - 动画展示数据变化
+    - _Requirements: 6.3, 6.4_
+  - [x] 8.4 编写画布状态属性测试
+    - **Property 5: 画布状态一致性**
+    - **Validates: Requirements 6.1, 6.2, 6.3, 6.5**
+
+- [x] 9. Checkpoint - 确保所有测试通过
+  - 确保所有测试通过，如有问题请询问用户
+
+- [x] 10. 悬浮组件和页面整合
+  - [x] 10.1 下载并添加微信二维码图片
+    - 下载指定的二维码图片到静态资源目录
+    - _Requirements: 8.3_
+  - [x] 10.2 实现FloatingBall组件
+    - 右下角显示"交流群"悬浮球
+    - 鼠标悬停显示二维码
+    - 保持图片原有比例
+    - 创建FloatingBall.tsx和FloatingBall.module.css
+    - _Requirements: 8.1, 8.2, 8.3, 8.4_
+  - [x] 10.3 整合App根组件
+    - 组合所有组件
+    - 实现单屏幕布局
+    - 连接状态管理
+    - 创建App.tsx和App.module.css
+    - _Requirements: 10.1, 10.2_
+
+- [x] 11. 最终检查和部署
+  - [x] 11.1 修复所有编译和linter错误
+    - 运行npm run build确保无编译错误
+    - 运行npm run lint确保无linter错误
+    - _Requirements: 9.3_
+  - [x] 11.2 本地测试完整功能
+    - 使用Playwright测试所有交互功能
+    - 验证快捷键功能
+    - 验证数据输入和验证
+    - _Requirements: 1.1-10.2_
+  - [x] 11.3 提交代码并推送部署
+    - git add, commit, push
+    - 确认GitHub Actions部署成功
+    - _Requirements: 9.1, 9.2_
+
+- [x] 12. Final Checkpoint - 确保所有测试通过
+  - 确保所有测试通过，如有问题请询问用户

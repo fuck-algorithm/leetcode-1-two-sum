@@ -65,41 +65,6 @@
   text-align: center;
 }
 
-.rateSelector {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: 12px;
-  padding-left: 12px;
-  border-left: 1px solid #3d3d5c;
-}
-
-.rateLabel {
-  color: #888;
-  font-size: 0.875rem;
-}
-
-.rateSelect {
-  padding: 6px 10px;
-  background: #2d2d44;
-  color: #ccc;
-  border: 1px solid #3d3d5c;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.rateSelect:hover {
-  background: #3d3d5c;
-  color: #fff;
-}
-
-.rateSelect:focus {
-  outline: none;
-  border-color: #4caf50;
-}
-
 .progressContainer {
   cursor: pointer;
   padding: 8px 0;

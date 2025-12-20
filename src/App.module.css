@@ -16,8 +16,8 @@
 }
 
 .codePanel {
-  flex: 0 0 400px;
-  min-width: 350px;
+  flex: 0 0 520px;
+  min-width: 450px;
   display: flex;
   flex-direction: column;
 }

@@ -62,12 +62,14 @@ export default function App() {
         currentStep={playerState.currentStepIndex}
         totalSteps={playerState.totalSteps}
         isPlaying={playerState.isPlaying}
+        playbackRate={playerState.playbackRate}
         onPrev={playerActions.prev}
         onNext={playerActions.next}
         onPlay={playerActions.play}
         onPause={playerActions.pause}
         onReset={playerActions.reset}
         onSeek={playerActions.seek}
+        onPlaybackRateChange={playerActions.setPlaybackRate}
       />
 
       <FloatingBall qrCodeUrl="/qrcode.svg" />

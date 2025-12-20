@@ -1,10 +1,15 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { Step } from '../types'
 
+// 可用的播放速率选项
+export const PLAYBACK_RATES = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3] as const
+export type PlaybackRate = (typeof PLAYBACK_RATES)[number]
+
 export interface AlgorithmPlayerState {
   currentStepIndex: number
   isPlaying: boolean
   totalSteps: number
+  playbackRate: PlaybackRate
 }
 
 export interface AlgorithmPlayerActions {
@@ -14,14 +19,16 @@ export interface AlgorithmPlayerActions {
   pause: () => void
   reset: () => void
   seek: (index: number) => void
+  setPlaybackRate: (rate: PlaybackRate) => void
 }
 
 export function useAlgorithmPlayer(
   steps: Step[],
-  playInterval = 1000
+  baseInterval = 1000
 ): [AlgorithmPlayerState, AlgorithmPlayerActions] {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [playbackRate, setPlaybackRateState] = useState<PlaybackRate>(1)
   const intervalRef = useRef<number | null>(null)
   const prevStepsRef = useRef<Step[]>(steps)
 
@@ -76,6 +83,13 @@ export function useAlgorithmPlayer(
     },
     [totalSteps]
   )
+
+  const setPlaybackRate = useCallback((rate: PlaybackRate) => {
+    setPlaybackRateState(rate)
+  }, [])
+
+  // 计算实际播放间隔（速率越高，间隔越短）
+  const playInterval = baseInterval / playbackRate
 
   // 自动播放逻辑
   useEffect(() => {
@@ -138,6 +152,7 @@ export function useAlgorithmPlayer(
     currentStepIndex: stepsChanged ? resetCurrentStep : currentStepIndex,
     isPlaying: stepsChanged ? resetIsPlaying : isPlaying,
     totalSteps,
+    playbackRate,
   }
 
   const actions: AlgorithmPlayerActions = {
@@ -147,6 +162,7 @@ export function useAlgorithmPlayer(
     pause,
     reset,
     seek,
+    setPlaybackRate,
   }
 
   return [state, actions]

@@ -121,12 +121,14 @@ export interface ControlPanelProps {
   currentStep: number
   totalSteps: number
   isPlaying: boolean
+  playbackRate: number
   onPrev: () => void
   onNext: () => void
   onPlay: () => void
   onPause: () => void
   onReset: () => void
   onSeek: (step: number) => void
+  onPlaybackRateChange: (rate: number) => void
 }
 
 export interface FloatingBallProps {

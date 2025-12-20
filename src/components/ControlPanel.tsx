@@ -1,3 +1,4 @@
+import { PLAYBACK_RATES, type PlaybackRate } from '../hooks/useAlgorithmPlayer'
 import type { ControlPanelProps } from '../types'
 import styles from './ControlPanel.module.css'
 
@@ -5,12 +6,14 @@ export function ControlPanel({
   currentStep,
   totalSteps,
   isPlaying,
+  playbackRate,
   onPrev,
   onNext,
   onPlay,
   onPause,
   onReset,
   onSeek,
+  onPlaybackRateChange,
 }: ControlPanelProps) {
   const progress = totalSteps > 1 ? (currentStep / (totalSteps - 1)) * 100 : 0
 
@@ -20,6 +23,11 @@ export function ControlPanel({
     const percentage = x / rect.width
     const step = Math.round(percentage * (totalSteps - 1))
     onSeek(step)
+  }
+
+  const handleRateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const rate = parseFloat(e.target.value) as PlaybackRate
+    onPlaybackRateChange(rate)
   }
 
   return (
@@ -74,6 +82,21 @@ export function ControlPanel({
         <span className={styles.stepInfo}>
           {currentStep + 1} / {totalSteps}
         </span>
+
+        <div className={styles.rateSelector}>
+          <label className={styles.rateLabel}>速率:</label>
+          <select
+            className={styles.rateSelect}
+            value={playbackRate}
+            onChange={handleRateChange}
+          >
+            {PLAYBACK_RATES.map((rate) => (
+              <option key={rate} value={rate}>
+                {rate}x
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className={styles.progressContainer} onClick={handleProgressClick}>

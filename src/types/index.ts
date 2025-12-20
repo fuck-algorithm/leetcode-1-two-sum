@@ -46,6 +46,31 @@ export interface Annotation {
   position: 'top' | 'bottom' | 'left' | 'right'
 }
 
+// 箭头连接（用于数据传递可视化）
+export interface ArrowConnection {
+  fromType: 'array' | 'hashmap' | 'calculation'
+  fromIndex: number
+  toType: 'array' | 'hashmap' | 'calculation'
+  toIndex: number
+  label?: string
+  color?: string
+}
+
+// 计算展示
+export interface CalculationDisplay {
+  expression: string
+  result: string
+  x: number
+  y: number
+}
+
+// 指针标注
+export interface PointerAnnotation {
+  targetIndex: number
+  label: string
+  color: string
+}
+
 // 算法步骤
 export interface Step {
   index: number
@@ -56,6 +81,10 @@ export interface Step {
   hashMapState: HashMapEntry[]
   highlightedIndices: number[]
   annotations: Annotation[]
+  arrows?: ArrowConnection[]
+  calculation?: CalculationDisplay
+  pointers?: PointerAnnotation[]
+  actionLabel?: string
 }
 
 // 画布变换

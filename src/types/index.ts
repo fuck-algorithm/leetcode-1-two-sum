@@ -117,18 +117,21 @@ export interface CanvasProps {
   inputData: InputData
 }
 
+// 播放速率类型
+export type PlaybackRate = 0.25 | 0.5 | 0.75 | 1 | 1.25 | 1.5 | 2 | 3
+
 export interface ControlPanelProps {
   currentStep: number
   totalSteps: number
   isPlaying: boolean
-  playbackRate: number
+  playbackRate: PlaybackRate
   onPrev: () => void
   onNext: () => void
   onPlay: () => void
   onPause: () => void
   onReset: () => void
   onSeek: (step: number) => void
-  onPlaybackRateChange: (rate: number) => void
+  onPlaybackRateChange: (rate: PlaybackRate) => void
 }
 
 export interface FloatingBallProps {

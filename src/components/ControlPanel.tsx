@@ -1,5 +1,5 @@
-import { PLAYBACK_RATES, type PlaybackRate } from '../hooks/useAlgorithmPlayer'
-import type { ControlPanelProps } from '../types'
+import { PLAYBACK_RATES } from '../hooks/useAlgorithmPlayer'
+import type { ControlPanelProps, PlaybackRate } from '../types'
 import styles from './ControlPanel.module.css'
 
 export function ControlPanel({
@@ -33,10 +33,11 @@ export function ControlPanel({
   return (
     <div className={styles.container}>
       <div className={styles.controls}>
-        <button onClick={onReset} className={styles.btn} title="重置">
+        <button onClick={onReset} className={styles.btn} title="重置 (R)">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
             <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
           </svg>
+          <span className={styles.shortcut}>R</span>
         </button>
 
         <button

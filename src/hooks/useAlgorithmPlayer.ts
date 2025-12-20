@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
-import type { Step } from '../types'
+import type { Step, PlaybackRate } from '../types'
+import { getPlaybackRate, setPlaybackRate as savePlaybackRate } from '../utils/indexedDB'
 
 // 可用的播放速率选项
-export const PLAYBACK_RATES = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3] as const
-export type PlaybackRate = (typeof PLAYBACK_RATES)[number]
+export const PLAYBACK_RATES: PlaybackRate[] = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3]
 
 export interface AlgorithmPlayerState {
   currentStepIndex: number
@@ -33,6 +33,15 @@ export function useAlgorithmPlayer(
   const prevStepsRef = useRef<Step[]>(steps)
 
   const totalSteps = steps.length
+
+  // 从IndexedDB加载保存的播放速度
+  useEffect(() => {
+    getPlaybackRate().then((savedRate) => {
+      if (savedRate !== null && PLAYBACK_RATES.includes(savedRate as PlaybackRate)) {
+        setPlaybackRateState(savedRate as PlaybackRate)
+      }
+    })
+  }, [])
 
   // 检测 steps 变化并重置状态
   const stepsChanged = steps !== prevStepsRef.current
@@ -86,6 +95,8 @@ export function useAlgorithmPlayer(
 
   const setPlaybackRate = useCallback((rate: PlaybackRate) => {
     setPlaybackRateState(rate)
+    // 保存到IndexedDB
+    savePlaybackRate(rate)
   }, [])
 
   // 计算实际播放间隔（速率越高，间隔越短）
@@ -141,12 +152,17 @@ export function useAlgorithmPlayer(
             play()
           }
           break
+        case 'r':
+        case 'R':
+          e.preventDefault()
+          reset()
+          break
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [next, prev, play, pause, isPlaying])
+  }, [next, prev, play, pause, reset, isPlaying])
 
   const state: AlgorithmPlayerState = {
     currentStepIndex: stepsChanged ? resetCurrentStep : currentStepIndex,

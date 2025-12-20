@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import type { InputData, PresetData, Step } from './types'
+import type { InputData, PresetData, Step, CodeLanguage } from './types'
 import { Header } from './components/Header'
 import { DataInput } from './components/DataInput'
 import { CodeDebugger } from './components/CodeDebugger'
@@ -7,7 +7,7 @@ import { Canvas } from './components/Canvas'
 import { ControlPanel } from './components/ControlPanel'
 import { FloatingBall } from './components/FloatingBall'
 import { useAlgorithmPlayer } from './hooks/useAlgorithmPlayer'
-import { generateSteps, TWO_SUM_CODE } from './utils/stepGenerator'
+import { generateSteps } from './utils/stepGenerator'
 import styles from './App.module.css'
 
 const PRESETS: PresetData[] = [
@@ -21,6 +21,7 @@ const DEFAULT_INPUT: InputData = { nums: [2, 7, 11, 15], target: 9 }
 
 export default function App() {
   const [inputData, setInputData] = useState<InputData>(DEFAULT_INPUT)
+  const [selectedLanguage, setSelectedLanguage] = useState<CodeLanguage>('java')
 
   const steps: Step[] = useMemo(() => {
     return generateSteps(inputData.nums, inputData.target)
@@ -47,7 +48,8 @@ export default function App() {
       <main className={styles.main}>
         <div className={styles.codePanel}>
           <CodeDebugger
-            code={TWO_SUM_CODE}
+            language={selectedLanguage}
+            onLanguageChange={setSelectedLanguage}
             currentLine={currentStep.currentLine}
             variables={currentStep.variables}
           />

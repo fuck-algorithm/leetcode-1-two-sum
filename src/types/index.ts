@@ -17,11 +17,21 @@ export interface ValidationResult {
   error?: string
 }
 
+// 支持的编程语言
+export type CodeLanguage = 'java' | 'python' | 'golang' | 'javascript'
+
 // 变量状态
 export interface VariableState {
   name: string
   value: string
   line: number
+}
+
+// 多语言变量状态
+export interface MultiLangVariableState {
+  name: string
+  value: string
+  lines: Record<CodeLanguage, number>
 }
 
 // 数组元素状态
@@ -107,7 +117,8 @@ export interface DataInputProps {
 }
 
 export interface CodeDebuggerProps {
-  code: string
+  language: CodeLanguage
+  onLanguageChange: (lang: CodeLanguage) => void
   currentLine: number
   variables: VariableState[]
 }

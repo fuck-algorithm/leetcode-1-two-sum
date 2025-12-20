@@ -21,7 +21,7 @@ export function FloatingBall({ qrCodeUrl }: FloatingBallProps) {
       {isHovered && (
         <div className={styles.qrCode}>
           <img src={qrCodeUrl} alt="微信交流群二维码" className={styles.qrImage} />
-          <p className={styles.qrText}>扫码加入交流群</p>
+          <p className={styles.qrText}>使用微信扫码发送"leetcode"加入算法交流群</p>
         </div>
       )}
     </div>

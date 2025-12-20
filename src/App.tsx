@@ -74,7 +74,7 @@ export default function App() {
         onPlaybackRateChange={playerActions.setPlaybackRate}
       />
 
-      <FloatingBall qrCodeUrl="/qrcode.svg" />
+      <FloatingBall qrCodeUrl={`${import.meta.env.BASE_URL}qrcode.png`} />
     </div>
   )
 }

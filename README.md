@@ -8,6 +8,4 @@
 
 ## 演示视频
 
-https://github.com/user-attachments/assets/video.mp4
-
-<video src="public/video.mp4" controls width="100%"></video>
+https://github.com/fuck-algorithm/leetcode-1-two-sum/raw/main/public/video.mp4

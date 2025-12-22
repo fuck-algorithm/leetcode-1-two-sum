@@ -310,8 +310,9 @@
 }
 
 /* Prism.js 语法高亮主题 - VS Code Dark+ 风格 */
-.codeArea code[class*='language-'],
-.codeArea pre[class*='language-'] {
+/* 使用 :global 确保 Prism 生成的 token 类名能正确匹配 */
+.codeArea :global(code[class*='language-']),
+.codeArea :global(pre[class*='language-']) {
   color: #d4d4d4;
   background: none;
   text-shadow: none;
@@ -321,77 +322,130 @@
 }
 
 /* 注释 */
-.codeArea .token.comment,
-.codeArea .token.prolog,
-.codeArea .token.doctype,
-.codeArea .token.cdata {
+.codeArea :global(.token.comment),
+.codeArea :global(.token.prolog),
+.codeArea :global(.token.doctype),
+.codeArea :global(.token.cdata) {
   color: #6a9955;
   font-style: italic;
 }
 
 /* 标点符号 */
-.codeArea .token.punctuation {
+.codeArea :global(.token.punctuation) {
   color: #d4d4d4;
 }
 
 /* 数字、布尔值、常量 */
-.codeArea .token.property,
-.codeArea .token.tag,
-.codeArea .token.boolean,
-.codeArea .token.number,
-.codeArea .token.constant,
-.codeArea .token.symbol {
+.codeArea :global(.token.property),
+.codeArea :global(.token.tag),
+.codeArea :global(.token.boolean),
+.codeArea :global(.token.number),
+.codeArea :global(.token.constant),
+.codeArea :global(.token.symbol) {
   color: #b5cea8;
 }
 
 /* 字符串 */
-.codeArea .token.selector,
-.codeArea .token.attr-name,
-.codeArea .token.string,
-.codeArea .token.char,
-.codeArea .token.builtin {
+.codeArea :global(.token.selector),
+.codeArea :global(.token.attr-name),
+.codeArea :global(.token.string),
+.codeArea :global(.token.char),
+.codeArea :global(.token.builtin) {
   color: #ce9178;
 }
 
 /* 操作符 */
-.codeArea .token.operator,
-.codeArea .token.entity,
-.codeArea .token.url,
-.codeArea .token.variable {
+.codeArea :global(.token.operator),
+.codeArea :global(.token.entity),
+.codeArea :global(.token.url),
+.codeArea :global(.token.variable) {
   color: #d4d4d4;
 }
 
-/* 函数名、类名 */
-.codeArea .token.atrule,
-.codeArea .token.attr-value,
-.codeArea .token.function,
-.codeArea .token.class-name {
+/* 函数名 */
+.codeArea :global(.token.atrule),
+.codeArea :global(.token.attr-value),
+.codeArea :global(.token.function) {
   color: #dcdcaa;
 }
 
 /* 关键字 */
-.codeArea .token.keyword {
+.codeArea :global(.token.keyword) {
   color: #569cd6;
 }
 
-/* 类型关键字 */
-.codeArea .token.keyword.type {
+/* 类型名、类名 - Java/Go 等语言的类型 */
+.codeArea :global(.token.type-name),
+.codeArea :global(.token.class-name) {
   color: #4ec9b0;
 }
 
 /* 正则表达式 */
-.codeArea .token.regex,
-.codeArea .token.important {
+.codeArea :global(.token.regex),
+.codeArea :global(.token.important) {
   color: #d16969;
 }
 
-/* 注解 */
-.codeArea .token.annotation {
+/* 注解 - Java @Override 等 */
+.codeArea :global(.token.annotation) {
   color: #dcdcaa;
 }
 
 /* 泛型 */
-.codeArea .token.generics {
+.codeArea :global(.token.generics) {
+  color: #4ec9b0;
+}
+
+/* Python 特有 */
+.codeArea :global(.token.decorator),
+.codeArea :global(.token.decorator .token.function) {
+  color: #dcdcaa;
+}
+
+.codeArea :global(.token.triple-quoted-string) {
+  color: #6a9955;
+}
+
+/* Go 特有 */
+.codeArea :global(.token.builtin) {
+  color: #4ec9b0;
+}
+
+/* JavaScript 特有 */
+.codeArea :global(.token.template-string) {
+  color: #ce9178;
+}
+
+.codeArea :global(.token.template-punctuation) {
+  color: #569cd6;
+}
+
+.codeArea :global(.token.arrow) {
+  color: #569cd6;
+}
+
+/* 方法调用 - 确保方法名高亮 */
+.codeArea :global(.token.method) {
+  color: #dcdcaa;
+}
+
+/* 参数 */
+.codeArea :global(.token.parameter) {
+  color: #9cdcfe;
+}
+
+/* 命名空间/包名 */
+.codeArea :global(.token.namespace) {
+  color: #4ec9b0;
+}
+
+/* 控制流关键字 */
+.codeArea :global(.token.control-flow) {
+  color: #c586c0;
+}
+
+/* 返回类型 */
+.codeArea :global(.token.return-type) {
   color: #4ec9b0;
 }
 

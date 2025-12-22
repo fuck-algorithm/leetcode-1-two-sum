@@ -1,9 +1,4 @@
 import { useMemo } from 'react'
-import Prism from 'prismjs'
-import 'prismjs/components/prism-java'
-import 'prismjs/components/prism-python'
-import 'prismjs/components/prism-go'
-import 'prismjs/components/prism-javascript'
 import type { CodeDebuggerProps, VariableState, CodeLanguage } from '../types'
 import {
   CODE_SNIPPETS,
@@ -11,16 +6,10 @@ import {
   LANGUAGE_ICONS,
   mapLineToLanguage,
 } from '../utils/codeSnippets'
+import { highlightLine, PRISM_LANGUAGE_MAP } from '../utils/syntaxHighlight'
 import styles from './CodeDebugger.module.css'
 
 const LANGUAGES: CodeLanguage[] = ['java', 'python', 'golang', 'javascript']
-
-const PRISM_LANGUAGE_MAP: Record<CodeLanguage, string> = {
-  java: 'java',
-  python: 'python',
-  golang: 'go',
-  javascript: 'javascript',
-}
 
 /**
  * 代码调试器组件
@@ -59,21 +48,6 @@ export function CodeDebugger({
     })
     return Array.from(varMap.values())
   }, [variables, language])
-
-  // 高亮单行代码
-  const highlightLine = (line: string): string => {
-    if (!line.trim()) return '&nbsp;'
-    try {
-      const prismLang = PRISM_LANGUAGE_MAP[language]
-      const grammar = Prism.languages[prismLang]
-      if (grammar) {
-        return Prism.highlight(line, grammar, prismLang)
-      }
-      return line
-    } catch {
-      return line
-    }
-  }
 
   // 获取某行的变量展示
   const getLineVariables = (lineNum: number): VariableState[] => {
@@ -135,7 +109,7 @@ export function CodeDebugger({
                   <code
                     className={`${styles.lineContent} language-${PRISM_LANGUAGE_MAP[language]}`}
                     dangerouslySetInnerHTML={{
-                      __html: highlightLine(line),
+                      __html: highlightLine(line, language),
                     }}
                   />
 

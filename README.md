@@ -8,4 +8,4 @@
 
 ## 演示视频
 
-https://github.com/fuck-algorithm/leetcode-1-two-sum/raw/main/public/video.mp4
+[![点击查看演示](public/qrcode.png)](https://fuck-algorithm.github.io/leetcode-1-two-sum/)

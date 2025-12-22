@@ -19,6 +19,37 @@
   color: #4fc3f7;
 }
 
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.videoButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.videoButton:hover {
+  background: linear-gradient(135deg, #ff5252, #d63031);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(238, 90, 36, 0.3);
+}
+
+.videoButton svg {
+  fill: currentColor;
+}
+
 .github {
   display: flex;
   align-items: center;
@@ -47,4 +78,76 @@
 
 .starCount svg {
   fill: #ffd700;
+}
+
+/* 视频模态框样式 */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  animation: scaleIn 0.2s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.video {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }

@@ -7,7 +7,6 @@ import {
   getLoadedLanguages,
   escapeHtml,
   SUPPORTED_LANGUAGES,
-  PRISM_LANGUAGE_MAP,
 } from '../syntaxHighlight'
 import type { CodeLanguage } from '../../types'
 

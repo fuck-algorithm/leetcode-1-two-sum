@@ -85,7 +85,7 @@ export function Header({ title, leetcodeUrl, githubUrl }: HeaderProps) {
               className={styles.video}
               controls
               autoPlay
-              src="/video.mp4"
+              src={`${import.meta.env.BASE_URL}video.mp4`}
             >
               您的浏览器不支持视频播放
             </video>

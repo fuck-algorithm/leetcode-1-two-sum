@@ -109,6 +109,8 @@ export interface HeaderProps {
   title: string
   leetcodeUrl: string
   githubUrl: string
+  backUrl?: string
+  backText?: string
 }
 
 export interface DataInputProps {

@@ -1,0 +1,51 @@
+# Implementation Plan
+
+- [x] 1. Update TypeScript interfaces
+  - [x] 1.1 Add backUrl and backText optional properties to HeaderProps interface
+    - Add `backUrl?: string` for custom back link URL
+    - Add `backText?: string` for custom back link text
+    - _Requirements: 2.1, 2.2, 2.3_
+
+- [x] 2. Update Header component
+  - [x] 2.1 Add default constants for back link
+    - Define DEFAULT_BACK_URL = 'https://fuck-algorithm.github.io/leetcode-hot-100/'
+    - Define DEFAULT_BACK_TEXT = '← 返回 LeetCode Hot 100'
+    - _Requirements: 2.2, 2.3_
+  - [x] 2.2 Implement back link element in Header component
+    - Add anchor element with backUrl (or default) as href
+    - Set target="_blank" and rel="noopener noreferrer"
+    - Display backText (or default) as link text
+    - _Requirements: 2.1, 2.2, 2.3, 3.2, 3.3_
+  - [x] 2.3 Restructure Header layout for three-column design
+    - Wrap back link in left section
+    - Keep title in center section
+    - Keep existing right section (video button, GitHub link)
+    - _Requirements: 4.1, 4.2, 4.3_
+  - [x] 2.4 Write property test for external links target attribute
+    - **Property 1: External links open in new tab**
+    - **Validates: Requirements 1.3, 2.3, 3.1, 3.2**
+  - [x] 2.5 Write property test for external links security attributes
+    - **Property 2: External links have security attributes**
+    - **Validates: Requirements 3.3**
+  - [x] 2.6 Write property test for title text preservation
+    - **Property 3: Title text preservation**
+    - **Validates: Requirements 1.1**
+
+- [x] 3. Update Header CSS styles
+  - [x] 3.1 Implement CSS Grid three-column layout
+    - Change header display to grid with three columns
+    - Left column: auto width, left-aligned
+    - Center column: 1fr, center-aligned
+    - Right column: auto width, right-aligned
+    - _Requirements: 4.1, 4.2, 4.3_
+  - [x] 3.2 Add styles for back link
+    - Style back link with appropriate colors and hover effects
+    - Ensure visual consistency with existing header design
+    - _Requirements: 2.1, 2.2_
+  - [x] 3.3 Adjust title styles for center alignment
+    - Update title styles to work with grid center column
+    - Maintain existing hover effects and link styling
+    - _Requirements: 1.2_
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

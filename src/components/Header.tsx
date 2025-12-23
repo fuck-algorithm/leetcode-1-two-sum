@@ -3,7 +3,10 @@ import type { HeaderProps } from '../types'
 import { getGitHubStars } from '../utils/indexedDB'
 import styles from './Header.module.css'
 
-export function Header({ title, leetcodeUrl, githubUrl }: HeaderProps) {
+const DEFAULT_BACK_URL = 'https://fuck-algorithm.github.io/leetcode-hot-100/'
+const DEFAULT_BACK_TEXT = '← 返回 LeetCode Hot 100'
+
+export function Header({ title, leetcodeUrl, githubUrl, backUrl, backText }: HeaderProps) {
   const [stars, setStars] = useState<number>(0)
   const [showVideo, setShowVideo] = useState(false)
 
@@ -24,6 +27,14 @@ export function Header({ title, leetcodeUrl, githubUrl }: HeaderProps) {
   return (
     <>
       <header className={styles.header}>
+        <a
+          href={backUrl || DEFAULT_BACK_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.backLink}
+        >
+          {backText || DEFAULT_BACK_TEXT}
+        </a>
         <a
           href={leetcodeUrl}
           target="_blank"

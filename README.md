@@ -6,6 +6,6 @@
 
 👉 **[点击查看在线演示](https://fuck-algorithm.github.io/leetcode-1-two-sum/)**
 
-## 演示视频
+## 演示预览
 
-[![点击查看演示](public/qrcode.png)](https://fuck-algorithm.github.io/leetcode-1-two-sum/)
+[![点击查看演示](public/preview.jpg)](https://fuck-algorithm.github.io/leetcode-1-two-sum/)

@@ -27,18 +27,19 @@
 }
 
 .sectionTitle {
-  fill: #888;
-  font-size: 12px;
-  font-weight: 500;
+  fill: #aaa;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .actionLabelBg {
   fill: #ff9800;
+  filter: drop-shadow(0 2px 4px rgba(255, 152, 0, 0.3));
 }
 
 .actionLabel {
   fill: #000;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   text-anchor: middle;
 }
@@ -171,5 +172,31 @@
 .emptyText {
   fill: #666;
   font-size: 12px;
+  font-style: italic;
+}
+
+/* 状态说明区域样式 */
+.statusBg {
+  fill: rgba(76, 175, 80, 0.15);
+  stroke: #4caf50;
+  stroke-width: 1;
+}
+
+.statusText {
+  fill: #a5d6a7;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.hintBg {
+  fill: rgba(33, 150, 243, 0.1);
+  stroke: #2196f3;
+  stroke-width: 1;
+  stroke-dasharray: 4,2;
+}
+
+.hintText {
+  fill: #90caf9;
+  font-size: 11px;
   font-style: italic;
 }

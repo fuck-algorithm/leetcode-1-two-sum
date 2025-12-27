@@ -6,9 +6,10 @@ import styles from './Canvas.module.css'
 const CELL_WIDTH = 70
 const CELL_HEIGHT = 55
 const CELL_GAP = 20
-const ARRAY_Y = 120
-const HASHMAP_Y_OFFSET = 380
+const ARRAY_Y = 200
+const HASHMAP_Y_OFFSET = 460
 const POINTER_AREA_HEIGHT = 80
+const STATUS_AREA_Y = 30
 
 export function Canvas({ step, inputData }: CanvasProps) {
   const svgRef = useRef<SVGSVGElement>(null)
@@ -94,26 +95,64 @@ export function Canvas({ step, inputData }: CanvasProps) {
         </defs>
 
         <g transform={`translate(${transform.x}, ${transform.y}) scale(${transform.scale})`}>
+          {/* 状态说明区域 */}
+          {(step.statusText || step.algorithmHint) && (
+            <g transform={`translate(0, ${STATUS_AREA_Y})`}>
+              {/* 状态文本 */}
+              {step.statusText && (
+                <g>
+                  <rect
+                    x={-10}
+                    y={-18}
+                    width={step.statusText.length * 10 + 40}
+                    height={28}
+                    rx={6}
+                    className={styles.statusBg}
+                  />
+                  <text x={10} y={4} className={styles.statusText}>
+                    💡 {step.statusText}
+                  </text>
+                </g>
+              )}
+              {/* 算法提示 */}
+              {step.algorithmHint && (
+                <g transform={`translate(0, 45)`}>
+                  <rect
+                    x={-10}
+                    y={-14}
+                    width={step.algorithmHint.length * 9 + 30}
+                    height={24}
+                    rx={4}
+                    className={styles.hintBg}
+                  />
+                  <text x={8} y={4} className={styles.hintText}>
+                    {step.algorithmHint}
+                  </text>
+                </g>
+              )}
+            </g>
+          )}
+
           {/* 操作标签 */}
           {step.actionLabel && (
-            <g transform={`translate(${(inputData.nums.length * (CELL_WIDTH + CELL_GAP)) / 2}, 10)`}>
+            <g transform={`translate(${(inputData.nums.length * (CELL_WIDTH + CELL_GAP)) / 2}, ${ARRAY_Y - 65})`}>
               <rect
-                x={-100}
-                y={-12}
-                width={200}
-                height={24}
-                rx={12}
+                x={-120}
+                y={-14}
+                width={240}
+                height={28}
+                rx={14}
                 className={styles.actionLabelBg}
               />
-              <text x={0} y={5} className={styles.actionLabel}>
+              <text x={0} y={6} className={styles.actionLabel}>
                 {step.actionLabel}
               </text>
             </g>
           )}
 
           {/* 数组标题 */}
-          <text x={0} y={ARRAY_Y - 25} className={styles.sectionTitle}>
-            数组 nums
+          <text x={0} y={ARRAY_Y - 30} className={styles.sectionTitle}>
+            📊 数组 nums (长度: {inputData.nums.length})
           </text>
 
           {/* 指针标注 */}
@@ -280,7 +319,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
 
           {/* HashMap 标题 */}
           <text x={0} y={HASHMAP_Y_OFFSET - 25} className={styles.sectionTitle}>
-            HashMap (值 → 索引)
+            🗂️ HashMap (值 → 索引) | 条目数: {step.hashMapState.length}
           </text>
 
           {/* HashMap 条目 */}

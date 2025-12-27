@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import * as fc from 'fast-check'
-import { render, cleanup } from '@testing-library/react'
+import { render, cleanup, fireEvent } from '@testing-library/react'
 import { Header } from '../Header'
 
 // Arbitrary for valid URLs
@@ -101,6 +101,47 @@ describe('Property 3: Title text preservation', () => {
         const titleLink = container.querySelector('a[class*="title"]')
         expect(titleLink).not.toBeNull()
         expect(titleLink?.textContent).toBe(title)
+        cleanup()
+      }),
+      { numRuns: 100 }
+    )
+  })
+})
+
+
+/**
+ * **Feature: algorithm-explanation, Property 1: Modal content contains all required sections**
+ * **Validates: Requirements 2.2**
+ *
+ * For any render of the Algorithm_Explanation_Modal, the modal content SHALL contain
+ * all four required sections: problem description, core idea, step-by-step process, and complexity analysis.
+ */
+describe('Property 1: Modal content contains all required sections', () => {
+  it('algorithm explanation modal should always contain all four required sections', () => {
+    fc.assert(
+      fc.property(titleArb, urlArb, urlArb, (title, leetcodeUrl, githubUrl) => {
+        cleanup()
+        const { container, getByLabelText } = render(
+          <Header title={title} leetcodeUrl={leetcodeUrl} githubUrl={githubUrl} />
+        )
+
+        // Click the algorithm explanation button to open the modal
+        const explanationButton = getByLabelText('查看算法思路')
+        fireEvent.click(explanationButton)
+
+        // Check that all four required sections are present
+        const sections = container.querySelectorAll('[data-section]')
+        const sectionTypes = Array.from(sections).map((s) => s.getAttribute('data-section'))
+
+        // Verify all four sections exist
+        expect(sectionTypes).toContain('problem')
+        expect(sectionTypes).toContain('idea')
+        expect(sectionTypes).toContain('steps')
+        expect(sectionTypes).toContain('complexity')
+
+        // Verify exactly 4 sections
+        expect(sections.length).toBe(4)
+
         cleanup()
       }),
       { numRuns: 100 }

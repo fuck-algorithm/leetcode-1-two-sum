@@ -95,6 +95,8 @@ export interface Step {
   calculation?: CalculationDisplay
   pointers?: PointerAnnotation[]
   actionLabel?: string
+  statusText?: string
+  algorithmHint?: string
 }
 
 // 画布变换

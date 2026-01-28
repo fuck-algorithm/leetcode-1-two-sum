@@ -56,7 +56,7 @@ export interface Annotation {
   position: 'top' | 'bottom' | 'left' | 'right'
 }
 
-// 箭头连接（用于数据传递可视化）
+// 箭头连接（用于数据/状态传递可视化）
 export interface ArrowConnection {
   fromType: 'array' | 'hashmap' | 'calculation'
   fromIndex: number
@@ -64,6 +64,17 @@ export interface ArrowConnection {
   toIndex: number
   label?: string
   color?: string
+  /**
+   * 视觉层级：数值越大越靠上，避免被其它元素遮挡
+   */
+  zIndex?: number
+  /**
+   * 标签偏移，用于避免与其它标签重叠
+   */
+  labelOffset?: {
+    x?: number
+    y?: number
+  }
 }
 
 // 计算展示
@@ -79,6 +90,13 @@ export interface PointerAnnotation {
   targetIndex: number
   label: string
   color: string
+  /**
+   * 同一个 targetIndex 上多个指针的布局偏移（用于避免互相遮挡）
+   */
+  offset?: {
+    x?: number
+    y?: number
+  }
 }
 
 // 算法步骤

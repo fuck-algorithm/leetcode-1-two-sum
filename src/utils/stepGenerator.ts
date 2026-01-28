@@ -108,7 +108,19 @@ export function generateSteps(nums: number[], target: number): Step[] {
         highlightedIndices: [i],
         annotations: [],
         actionLabel: `👁️ 读取 nums[${i}] = ${currentNum}`,
-        pointers: [{ targetIndex: i, label: `当前值: ${currentNum}`, color: '#ffeb3b' }],
+        pointers: [{ targetIndex: i, label: `当前值: ${currentNum}`, color: '#ffeb3b', offset: { y: -10 } }],
+        arrows: [
+          {
+            fromType: 'array',
+            fromIndex: i,
+            toType: 'calculation',
+            toIndex: 0,
+            label: `读取值`,
+            color: '#ffeb3b',
+            zIndex: 1,
+            labelOffset: { x: 20, y: -15 },
+          },
+        ],
         statusText: `当前元素值为 ${currentNum}`,
         algorithmHint: `需要找到另一个数 x，使得 ${currentNum} + x = ${target}`,
       })
@@ -131,14 +143,26 @@ export function generateSteps(nums: number[], target: number): Step[] {
         highlightedIndices: [i],
         annotations: [],
         actionLabel: '🧮 计算补数 complement',
-        pointers: [{ targetIndex: i, label: `当前: ${currentNum}`, color: '#ffeb3b' }],
+        pointers: [{ targetIndex: i, label: `${currentNum}`, color: '#ffeb3b', offset: { y: -10 } }],
         calculation: {
-          expression: `complement = target - nums[${i}]`,
-          result: `${target} - ${currentNum} = ${complement}`,
+          expression: `complement = ${target} - ${currentNum}`,
+          result: `= ${complement}`,
           x: arrayWidth + 30,
           y: 0,
         },
-        statusText: `补数 = 目标值 - 当前值 = ${target} - ${currentNum} = ${complement}`,
+        arrows: [
+          {
+            fromType: 'array',
+            fromIndex: i,
+            toType: 'calculation',
+            toIndex: 0,
+            label: `计算补数`,
+            color: '#ffeb3b',
+            zIndex: 1,
+            labelOffset: { x: 20, y: -10 },
+          },
+        ],
+        statusText: `计算: complement = ${target} - ${currentNum} = ${complement}`,
         algorithmHint: `如果 HashMap 中存在 ${complement}，则找到答案！`,
       })
     )
@@ -169,11 +193,24 @@ export function generateSteps(nums: number[], target: number): Step[] {
           x: arrayWidth + 30,
           y: 0,
         },
-        statusText: hasComplement 
-          ? `🎉 HashMap 中存在 ${complement}！` 
+        // 数据流：用箭头明确「计算出的 complement」去 HashMap 查找
+        arrows: [
+          {
+            fromType: 'calculation',
+            fromIndex: 0,
+            toType: 'hashmap',
+            toIndex: Math.max(0, complementMapIndex),
+            label: `查找 ${complement}`,
+            color: '#ff9800',
+            zIndex: 2,
+            labelOffset: { x: -80, y: -30 },
+          },
+        ],
+        statusText: hasComplement
+          ? `🎉 HashMap 中存在 ${complement}！`
           : `HashMap 中不存在 ${complement}`,
-        algorithmHint: hasComplement 
-          ? '补数存在，可以返回结果了！' 
+        algorithmHint: hasComplement
+          ? '补数存在，可以返回结果了！'
           : '补数不存在，需要将当前值存入 HashMap',
       })
     )
@@ -197,8 +234,8 @@ export function generateSteps(nums: number[], target: number): Step[] {
           annotations: [],
           actionLabel: `🎯 找到补数 ${complement} 在索引 ${complementIndex}`,
           pointers: [
-            { targetIndex: complementIndex, label: `补数: ${complement}`, color: '#4caf50' },
-            { targetIndex: i, label: `当前: ${currentNum}`, color: '#ffeb3b' },
+            { targetIndex: complementIndex, label: `补数${complement}`, color: '#4caf50', offset: { y: -15 } },
+            { targetIndex: i, label: `当前${currentNum}`, color: '#ffeb3b', offset: { y: -15 } },
           ],
           arrows: [
             {
@@ -206,8 +243,10 @@ export function generateSteps(nums: number[], target: number): Step[] {
               fromIndex: complementMapIndex,
               toType: 'array',
               toIndex: complementIndex,
-              label: `map[${complement}] → 索引 ${complementIndex}`,
+              label: `返回索引${complementIndex}`,
               color: '#4caf50',
+              zIndex: 3,
+              labelOffset: { x: -70, y: -35 },
             },
           ],
           statusText: `从 HashMap 获取 ${complement} 的索引: ${complementIndex}`,
@@ -234,12 +273,12 @@ export function generateSteps(nums: number[], target: number): Step[] {
           annotations: [],
           actionLabel: `✅ 验证: ${nums[complementIndex]} + ${currentNum} = ${target}`,
           pointers: [
-            { targetIndex: complementIndex, label: `第一个数: ${nums[complementIndex]}`, color: '#4caf50' },
-            { targetIndex: i, label: `第二个数: ${currentNum}`, color: '#4caf50' },
+            { targetIndex: complementIndex, label: `数1=${nums[complementIndex]}`, color: '#4caf50', offset: { y: -20 } },
+            { targetIndex: i, label: `数2=${currentNum}`, color: '#4caf50', offset: { y: -20 } },
           ],
           calculation: {
-            expression: `nums[${complementIndex}] + nums[${i}]`,
-            result: `${nums[complementIndex]} + ${currentNum} = ${target} ✅`,
+            expression: `${nums[complementIndex]} + ${currentNum}`,
+            result: `= ${target} ✅`,
             x: arrayWidth + 30,
             y: 0,
           },
@@ -247,10 +286,22 @@ export function generateSteps(nums: number[], target: number): Step[] {
             {
               fromType: 'array',
               fromIndex: complementIndex,
-              toType: 'array',
-              toIndex: i,
-              label: `${nums[complementIndex]} + ${currentNum} = ${target}`,
+              toType: 'calculation',
+              toIndex: 0,
+              label: `数值${nums[complementIndex]}`,
               color: '#4caf50',
+              zIndex: 3,
+              labelOffset: { x: 20, y: -12 },
+            },
+            {
+              fromType: 'array',
+              fromIndex: i,
+              toType: 'calculation',
+              toIndex: 1,
+              label: `数值${currentNum}`,
+              color: '#4caf50',
+              zIndex: 3,
+              labelOffset: { x: 20, y: 12 },
             },
           ],
           statusText: `验证成功: nums[${complementIndex}] + nums[${i}] = ${nums[complementIndex]} + ${currentNum} = ${target}`,
@@ -277,9 +328,15 @@ export function generateSteps(nums: number[], target: number): Step[] {
           annotations: [],
           actionLabel: `🎉 答案: [${complementIndex}, ${i}]`,
           pointers: [
-            { targetIndex: complementIndex, label: `答案[0] = ${complementIndex}`, color: '#4caf50' },
-            { targetIndex: i, label: `答案[1] = ${i}`, color: '#4caf50' },
+            { targetIndex: complementIndex, label: `索引${complementIndex}`, color: '#4caf50', offset: { y: -25 } },
+            { targetIndex: i, label: `索引${i}`, color: '#4caf50', offset: { y: -25 } },
           ],
+          calculation: {
+            expression: `return [${complementIndex}, ${i}]`,
+            result: `✅ 算法完成`,
+            x: arrayWidth + 30,
+            y: 0,
+          },
           statusText: `返回索引数组 [${complementIndex}, ${i}]`,
           algorithmHint: `时间复杂度 O(n)，空间复杂度 O(n)`,
         })
@@ -318,13 +375,36 @@ export function generateSteps(nums: number[], target: number): Step[] {
         highlightedIndices: [i],
         annotations: [],
         actionLabel: `📝 准备存入: map.put(${currentNum}, ${i})`,
-        pointers: [{ targetIndex: i, label: `待存入: ${currentNum}`, color: '#2196f3' }],
+        pointers: [{ targetIndex: i, label: `值${currentNum}`, color: '#2196f3', offset: { y: -12 } }],
         calculation: {
-          expression: `map.put(nums[${i}], ${i})`,
-          result: `map.put(${currentNum}, ${i})`,
+          expression: `map.put(${currentNum}, ${i})`,
+          result: `准备写入 HashMap`,
           x: arrayWidth + 30,
           y: 0,
         },
+        // 数据流：从当前数组元素（key）写入 HashMap
+        arrows: [
+          {
+            fromType: 'array',
+            fromIndex: i,
+            toType: 'calculation',
+            toIndex: 0,
+            label: `key=${currentNum}`,
+            color: '#2196f3',
+            zIndex: 2,
+            labelOffset: { x: 20, y: -10 },
+          },
+          {
+            fromType: 'calculation',
+            fromIndex: 0,
+            toType: 'hashmap',
+            toIndex: Math.max(0, hashMap.length),
+            label: `写入操作`,
+            color: '#ff9800',
+            zIndex: 2,
+            labelOffset: { x: -70, y: -25 },
+          },
+        ],
         statusText: `将 ${currentNum} 作为 key，${i} 作为 value 存入 HashMap`,
         algorithmHint: '存储格式: 数组值 → 索引，方便后续通过值查找索引',
       })
@@ -349,15 +429,23 @@ export function generateSteps(nums: number[], target: number): Step[] {
         highlightedIndices: [i],
         annotations: [],
         actionLabel: `✅ 已存入 map[${currentNum}] = ${i}`,
-        pointers: [{ targetIndex: i, label: `已存入`, color: '#4caf50' }],
+        pointers: [{ targetIndex: i, label: `完成`, color: '#4caf50', offset: { y: -12 } }],
+        calculation: {
+          expression: `HashMap[${newMapIndex}]`,
+          result: `${currentNum} → ${i} ✓`,
+          x: arrayWidth + 30,
+          y: 0,
+        },
         arrows: [
           {
-            fromType: 'array',
-            fromIndex: i,
-            toType: 'hashmap',
-            toIndex: newMapIndex,
-            label: `存入: ${currentNum} → ${i}`,
-            color: '#2196f3',
+            fromType: 'hashmap',
+            fromIndex: newMapIndex,
+            toType: 'calculation',
+            toIndex: 0,
+            label: `确认存入`,
+            color: '#4caf50',
+            zIndex: 3,
+            labelOffset: { x: 15, y: -15 },
           },
         ],
         statusText: `HashMap 新增条目: key=${currentNum}, value=${i}`,

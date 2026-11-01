@@ -7,7 +7,7 @@ const CELL_WIDTH = 70
 const CELL_HEIGHT = 55
 const CELL_GAP = 20
 const ARRAY_Y = 200
-const HASHMAP_Y_OFFSET = 460
+const HASHMAP_Y_OFFSET = 390
 const POINTER_AREA_HEIGHT = 80
 const STATUS_AREA_Y = 30
 
@@ -23,7 +23,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
     const container = containerRef.current
 
     const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.5, 2])
+      .scaleExtent([0.35, 2.5])
       .on('zoom', (event) => {
         setTransform({
           x: event.transform.x,
@@ -32,25 +32,29 @@ export function Canvas({ step, inputData }: CanvasProps) {
         })
       })
 
-    svg.call(zoom)
+    svg.call(zoom).on('dblclick.zoom', null)
 
-    const contentWidth = inputData.nums.length * (CELL_WIDTH + CELL_GAP)
-    const contentHeight = HASHMAP_Y_OFFSET + 150
-    const containerWidth = container.clientWidth
-    const containerHeight = container.clientHeight
+    const fitContent = () => {
+      const contentWidth = Math.max(
+        inputData.nums.length * (CELL_WIDTH + CELL_GAP) + 340,
+        520,
+      )
+      const contentHeight = HASHMAP_Y_OFFSET + 250
+      const width = svgRef.current?.clientWidth ?? container.clientWidth
+      const height = svgRef.current?.clientHeight ?? container.clientHeight
+      svg.attr('viewBox', `0 0 ${width} ${height}`)
+      const scale = Math.min(width / (contentWidth + 24), height / (contentHeight + 24), 1.2) * 1.35
+      const initialX = (width - contentWidth * scale) / 2
+      const initialY = (height - contentHeight * scale) / 2
+      svg.call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY).scale(scale))
+    }
 
-    const scale = Math.min(
-      containerWidth / (contentWidth + 100),
-      containerHeight / (contentHeight + 50),
-      1
-    )
-
-    const initialX = (containerWidth - contentWidth * scale) / 2
-    const initialY = 20
-
-    svg.call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY).scale(scale))
+    fitContent()
+    const observer = new ResizeObserver(fitContent)
+    observer.observe(container)
 
     return () => {
+      observer.disconnect()
       svg.on('.zoom', null)
     }
   }, [inputData.nums.length])
@@ -365,7 +369,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
             // 计算起点位置（箭头从这里开始）
             if (arrow.fromType === 'array') {
               x1 = arrow.fromIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y1 = ARRAY_Y + CELL_HEIGHT + 25
+              y1 = ARRAY_Y + CELL_HEIGHT + 50
             } else if (arrow.fromType === 'hashmap') {
               x1 = arrow.fromIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
               y1 = HASHMAP_Y_OFFSET - 10
@@ -381,7 +385,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
               y2 = HASHMAP_Y_OFFSET - 10
             } else if (arrow.toType === 'array') {
               x2 = arrow.toIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y2 = ARRAY_Y + CELL_HEIGHT + 25
+              y2 = ARRAY_Y + CELL_HEIGHT + 50
             } else if (arrow.toType === 'calculation') {
               x2 = (step.calculation?.x ?? 0) + 20
               y2 = (step.calculation?.y ?? 0) + ARRAY_Y + 10 + (arrow.toIndex ?? 0) * 12

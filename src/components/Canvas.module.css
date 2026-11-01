@@ -1,421 +1,70 @@
 .container {
-  background: #0f0f23;
-  border-radius: 8px;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  background-color: #101a20;
+  background-image: radial-gradient(#304048 0.7px, transparent 0.7px);
+  background-size: 22px 22px;
+  border: 1px solid #293942;
+  border-radius: 8px;
 }
-
 .header {
-  padding: 8px 12px;
-  background: #2d2d44;
-  color: #888;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.svg {
-  flex: 1;
-  width: 100%;
-  cursor: grab;
-}
-
-.svg:active {
-  cursor: grabbing;
-}
-
-.sectionTitle {
-  fill: #aaa;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.actionLabelBg {
-  fill: #ff9800;
-  filter: drop-shadow(0 2px 4px rgba(255, 152, 0, 0.3));
-}
-
-.actionLabel {
-  fill: #000;
-  font-size: 13px;
-  font-weight: 600;
-  text-anchor: middle;
-}
-
-.pointerLabel {
-  font-size: 12px;
-  font-weight: 700;
-  text-anchor: middle;
-  dominant-baseline: middle;
-}
-
-.pointerLabelBg {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-}
-
-.pointerArrow {
-  animation: bounce 0.6s ease-in-out infinite;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(5px); }
-}
-
-.pointerLine {
-  animation: pointerLinePulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pointerLinePulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
-
-.pointerTargetDot {
-  animation: targetDotPulse 1.2s ease-in-out infinite;
-}
-
-@keyframes targetDotPulse {
-  0%, 100% { 
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% { 
-    transform: scale(1.4);
-    opacity: 1;
-  }
-}
-
-.cell {
-  fill: #2d2d44;
-  stroke: #3d3d5c;
-  stroke-width: 2;
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
-}
-
-.highlighted {
-  fill: #2e7d32;
-  stroke: #66bb6a;
-  animation: highlightPulse 1s ease-in-out infinite;
-}
-
-@keyframes highlightPulse {
-  0%, 100% { 
-    filter: drop-shadow(0 2px 6px rgba(76, 175, 80, 0.4));
-  }
-  50% { 
-    filter: drop-shadow(0 4px 12px rgba(76, 175, 80, 0.8));
-  }
-}
-
-.cellGlow {
-  animation: glowPulse 1.5s ease-in-out infinite;
-}
-
-.cellFieldLabel {
-  fill: #64b5f6;
-  font-size: 9px;
-  font-weight: 500;
-  opacity: 0.8;
-}
-
-.cellValue {
-  fill: #fff;
-  font-size: 17px;
-  font-weight: 700;
-  text-anchor: middle;
-  dominant-baseline: middle;
-}
-
-.cellIndex {
-  fill: #7986cb;
+  z-index: 1;
+  flex: 0 0 32px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(100, 126, 130, .18);
+  background: rgba(16, 26, 32, .88);
+  color: #91a29f;
   font-size: 11px;
-  text-anchor: middle;
-  font-weight: 500;
+  letter-spacing: .02em;
 }
-
-.cellStatusDot {
-  animation: statusDotPulse 1s ease-in-out infinite;
-}
-
-@keyframes statusDotPulse {
-  0%, 100% { 
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.6;
-    transform: scale(1.3);
-  }
-}
-
-.calculationBg {
-  fill: rgba(33, 150, 243, 0.2);
-  stroke: #2196f3;
-  stroke-width: 2;
-  filter: drop-shadow(0 4px 8px rgba(33, 150, 243, 0.3));
-  animation: calculationPulse 2s ease-in-out infinite;
-}
-
-@keyframes calculationPulse {
-  0%, 100% { 
-    fill: rgba(33, 150, 243, 0.2);
-  }
-  50% { 
-    fill: rgba(33, 150, 243, 0.28);
-  }
-}
-
-.calculationTitle {
-  fill: #64b5f6;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.calculationExpr {
-  fill: #90caf9;
-  font-size: 13px;
-  font-family: 'Fira Code', monospace;
-  font-weight: 500;
-}
-
-.calculationResult {
-  fill: #fff;
-  font-size: 17px;
-  font-weight: 700;
-  font-family: 'Fira Code', monospace;
-}
-
-.calculationIcon {
-  animation: iconRotate 3s linear infinite;
-}
-
-@keyframes iconRotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.calculationIconText {
-  fill: #4caf50;
-  font-size: 12px;
-  font-weight: 700;
-  text-anchor: middle;
-  dominant-baseline: middle;
-}
-
-.arrow {
-  animation: drawArrow 0.5s ease-out;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
-}
-
-@keyframes drawArrow {
-  from {
-    stroke-dasharray: 100;
-    stroke-dashoffset: 100;
-  }
-  to {
-    stroke-dasharray: 100;
-    stroke-dashoffset: 0;
-  }
-}
-
-/* 箭头流动动画 */
-.arrowFlow {
-  animation: flowAnimation 2s linear infinite;
-}
-
-@keyframes flowAnimation {
-  from {
-    stroke-dashoffset: 0;
-  }
-  to {
-    stroke-dashoffset: 16;
-  }
-}
-
-/* 箭头起点圆点动画 */
-.arrowStartDot {
-  animation: dotPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes dotPulse {
-  0%, 100% { 
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.6;
-    transform: scale(1.3);
-  }
-}
-
-.arrowLabel {
-  font-size: 12px;
-  font-weight: 600;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  letter-spacing: 0.3px;
-}
-
-.arrowLabelBg {
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
-}
-
-.hashCell {
-  fill: #1a237e;
-  stroke: #3949ab;
-  stroke-width: 2;
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.newEntry {
-  fill: #2e7d32;
-  stroke: #66bb6a;
-  animation: pulse 0.8s ease-out;
-}
-
-@keyframes pulse {
-  0% { 
-    transform: scale(0.95);
-    opacity: 0.8;
-  }
-  50% { 
-    transform: scale(1.08);
-    opacity: 1;
-  }
-  100% { 
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.newEntryGlow {
-  animation: glowPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-  0%, 100% { 
-    opacity: 0.6;
-    stroke-width: 2;
-  }
-  50% { 
-    opacity: 1;
-    stroke-width: 4;
-  }
-}
-
-.hashFieldLabel {
-  fill: #64b5f6;
-  font-size: 9px;
-  font-weight: 500;
-  opacity: 0.8;
-}
-
-.hashKey {
-  fill: #90caf9;
-  font-size: 15px;
-  font-weight: 700;
-  text-anchor: middle;
-}
-
-.hashDivider {
-  stroke: #5c6bc0;
-  stroke-width: 2;
-  opacity: 0.6;
-}
-
-.hashValue {
-  fill: #fff;
-  font-size: 15px;
-  font-weight: 700;
-  text-anchor: middle;
-}
-
-.newLabel {
-  fill: #81c784;
-  font-size: 11px;
-  text-anchor: middle;
-  font-weight: 700;
-  animation: labelBounce 0.6s ease-out;
-}
-
-@keyframes labelBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-.hashIndexLabel {
-  fill: #7986cb;
-  font-size: 10px;
-  text-anchor: middle;
-  opacity: 0.7;
-}
-
-.emptyText {
-  fill: #666;
-  font-size: 12px;
-  font-style: italic;
-}
-
-/* 状态说明区域样式 */
-.statusBg {
-  fill: rgba(33, 150, 243, 0.12);
-  stroke: #2196f3;
-  stroke-width: 2;
-  filter: drop-shadow(0 4px 12px rgba(33, 150, 243, 0.25));
-  animation: statusBgPulse 3s ease-in-out infinite;
-}
-
-@keyframes statusBgPulse {
-  0%, 100% { 
-    fill: rgba(33, 150, 243, 0.12);
-    stroke: #2196f3;
-  }
-  50% { 
-    fill: rgba(33, 150, 243, 0.18);
-    stroke: #42a5f5;
-  }
-}
-
-.statusSectionLabel {
-  fill: #64b5f6;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  opacity: 0.9;
-}
-
-.statusText {
-  fill: #90caf9;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.actionLabel {
-  fill: #ffeb3b;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-}
-
-.hintBg {
-  fill: rgba(33, 150, 243, 0.1);
-  stroke: #2196f3;
-  stroke-width: 1;
-  stroke-dasharray: 4,2;
-}
-
-.hintText {
-  fill: #81c784;
-  font-size: 11px;
-  font-weight: 500;
-  font-style: italic;
-  opacity: 0.95;
-}
+.svg { flex: 1; width: 100%; height: 100%; min-height: 0; cursor: grab; touch-action: none; }
+.svg:active { cursor: grabbing; }
+.sectionTitle { fill: #91a29f; font-size: 13px; font-weight: 600; }
+.actionLabelBg { fill: #e9b86e; }
+.actionLabel { fill: #13201f; font-size: 13px; font-weight: 700; text-anchor: middle; }
+.pointerLabel { font-size: 12px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+.pointerLabelBg { filter: drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
+.pointerArrow { filter: drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+.pointerLine { opacity: .68; }
+.pointerTargetDot { opacity: .85; }
+.cell { fill: #1b2b32; stroke: #3c535a; stroke-width: 1.5; transition: fill .18s, stroke .18s; }
+.highlighted { fill: #274b40; stroke: #8fd5b5; }
+.cellGlow { opacity: .2; }
+.cellFieldLabel { fill: #91a29f; font-size: 9px; font-weight: 500; }
+.cellValue { fill: #e4ece8; font-size: 17px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+.cellIndex { fill: #91a29f; font-size: 10px; text-anchor: middle; font-weight: 500; }
+.cellStatusDot { opacity: .9; }
+.calculationBg { fill: #192b33; stroke: #4a7773; stroke-width: 1.5; }
+.calculationTitle { fill: #8fd5b5; font-size: 12px; font-weight: 600; }
+.calculationExpr { fill: #b7ccc4; font-size: 13px; font-family: 'SFMono-Regular', Consolas, monospace; font-weight: 500; }
+.calculationResult { fill: #e4ece8; font-size: 16px; font-weight: 700; font-family: 'SFMono-Regular', Consolas, monospace; }
+.calculationIcon { opacity: .8; }
+.calculationIconText { fill: #8fd5b5; font-size: 12px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+.arrow { opacity: .82; }
+.arrowFlow { opacity: .28; }
+.arrowStartDot { opacity: .85; }
+.arrowLabel { font-size: 11px; font-weight: 600; text-anchor: middle; dominant-baseline: middle; }
+.arrowLabelBg { opacity: .92; }
+.hashCell { fill: #20353a; stroke: #49656a; stroke-width: 1.5; }
+.newEntry { fill: #274b40; stroke: #8fd5b5; }
+.newEntryGlow { opacity: .28; }
+.hashFieldLabel { fill: #91a29f; font-size: 9px; font-weight: 500; }
+.hashKey { fill: #e9b86e; font-size: 14px; font-weight: 700; text-anchor: middle; }
+.hashDivider { stroke: #49656a; stroke-width: 1; opacity: .8; }
+.hashValue { fill: #e4ece8; font-size: 14px; font-weight: 700; text-anchor: middle; }
+.newLabel { fill: #8fd5b5; font-size: 10px; text-anchor: middle; font-weight: 700; }
+.hashIndexLabel { fill: #91a29f; font-size: 10px; text-anchor: middle; opacity: .7; }
+.emptyText { fill: #91a29f; font-size: 12px; font-style: italic; }
+.statusBg { fill: #17272d; stroke: #3d6261; stroke-width: 1; }
+.statusSectionLabel { fill: #91a29f; font-size: 10px; font-weight: 600; }
+.statusText { fill: #d1e0d9; font-size: 12px; font-weight: 500; }
+.hintBg { fill: #17272d; stroke: #3d6261; stroke-width: 1; stroke-dasharray: 4,2; }
+.hintText { fill: #8fd5b5; font-size: 11px; font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .container * { animation: none !important; transition: none !important; } }

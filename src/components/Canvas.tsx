@@ -6,8 +6,8 @@ import styles from './Canvas.module.css'
 const CELL_WIDTH = 70
 const CELL_HEIGHT = 55
 const CELL_GAP = 20
-const ARRAY_Y = 200
-const HASHMAP_Y_OFFSET = 390
+const ARRAY_Y = 260
+const HASHMAP_Y_OFFSET = 450
 const POINTER_AREA_HEIGHT = 80
 const STATUS_AREA_Y = 30
 
@@ -39,13 +39,13 @@ export function Canvas({ step, inputData }: CanvasProps) {
         inputData.nums.length * (CELL_WIDTH + CELL_GAP) + 340,
         520,
       )
-      const contentHeight = HASHMAP_Y_OFFSET + 250
+      const contentHeight = HASHMAP_Y_OFFSET + 110
       const width = svgRef.current?.clientWidth ?? container.clientWidth
       const height = svgRef.current?.clientHeight ?? container.clientHeight
       svg.attr('viewBox', `0 0 ${width} ${height}`)
-      const scale = Math.min(width / (contentWidth + 24), height / (contentHeight + 24), 1.2) * 1.35
-      const initialX = (width - contentWidth * scale) / 2
-      const initialY = (height - contentHeight * scale) / 2
+      const scale = Math.min(width / (contentWidth + 24), height / (contentHeight + 24), 1.2)
+      const initialX = 20
+      const initialY = 0
       svg.call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY).scale(scale))
     }
 
@@ -369,26 +369,26 @@ export function Canvas({ step, inputData }: CanvasProps) {
             // 计算起点位置（箭头从这里开始）
             if (arrow.fromType === 'array') {
               x1 = arrow.fromIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y1 = ARRAY_Y + CELL_HEIGHT + 50
+              y1 = ARRAY_Y + CELL_HEIGHT + 5
             } else if (arrow.fromType === 'hashmap') {
               x1 = arrow.fromIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y1 = HASHMAP_Y_OFFSET - 10
+              y1 = HASHMAP_Y_OFFSET
             } else if (arrow.fromType === 'calculation') {
-              // calculation 区域固定在数组右侧，用 fromIndex 做"行"偏移以避免重叠
-              x1 = (step.calculation?.x ?? 0) + 40
-              y1 = (step.calculation?.y ?? 0) + ARRAY_Y + 10 + (arrow.fromIndex ?? 0) * 12
+              // Calculation 右侧边缘是数据流出口，按行错开多个来源。
+              x1 = (step.calculation?.x ?? 0) + 265
+              y1 = (step.calculation?.y ?? 0) + ARRAY_Y + 10 + (arrow.fromIndex ?? 0) * 22
             }
 
             // 计算终点位置（箭头指向这里）
             if (arrow.toType === 'hashmap') {
               x2 = arrow.toIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y2 = HASHMAP_Y_OFFSET - 10
+              y2 = HASHMAP_Y_OFFSET + CELL_HEIGHT / 2
             } else if (arrow.toType === 'array') {
               x2 = arrow.toIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y2 = ARRAY_Y + CELL_HEIGHT + 50
+              y2 = ARRAY_Y + CELL_HEIGHT + 5
             } else if (arrow.toType === 'calculation') {
-              x2 = (step.calculation?.x ?? 0) + 20
-              y2 = (step.calculation?.y ?? 0) + ARRAY_Y + 10 + (arrow.toIndex ?? 0) * 12
+              x2 = (step.calculation?.x ?? 0) - 15
+              y2 = (step.calculation?.y ?? 0) + ARRAY_Y + 10 + (arrow.toIndex ?? 0) * 22
             }
 
             const markerId =
@@ -398,47 +398,19 @@ export function Canvas({ step, inputData }: CanvasProps) {
                   ? 'arrowhead-blue'
                   : 'arrowhead'
 
-            // 改进的标签位置计算 - 避免重叠
-            const midX = (x1 + x2) / 2
-            const midY = (y1 + y2) / 2
-            
-            // 根据箭头方向智能调整标签位置
             const isGoingUp = y1 > y2
             const isGoingRight = x2 > x1
             const isGoingLeft = x2 < x1
-            
-            // 基础偏移量
-            let baseLabelX = midX
-            let baseLabelY = midY
-            
-            // 根据方向调整标签位置，避免与箭头重叠
-            if (isGoingUp) {
-              // 向上的箭头，标签放在右侧
-              baseLabelX = Math.max(x1, x2) + 40
-              baseLabelY = midY - 10
-            } else {
-              // 向下的箭头，标签放在右侧但稍微往下
-              baseLabelX = Math.max(x1, x2) + 40
-              baseLabelY = midY + 10
-            }
-            
-            // 如果箭头是横向的，调整策略
-            if (Math.abs(y2 - y1) < 50) {
-              baseLabelY = Math.min(y1, y2) - 25
-            }
-            
-            // 应用用户自定义偏移
+            const controlOffset = Math.max(36, Math.abs(y2 - y1) * 0.42)
+            // 曲线离开计算框时先向外绕行，避免穿过表达式与结果。
+            const controlX1 = x1 + (arrow.fromType === 'calculation' ? 64 : isGoingRight ? 50 : -50)
+            const controlX2 = x2 + (arrow.toType === 'calculation' ? -64 : isGoingLeft ? -50 : 50)
+            const controlY1 = y1 + (isGoingUp ? -controlOffset : controlOffset)
+            const controlY2 = y2 + (isGoingUp ? controlOffset : -controlOffset)
+            const baseLabelX = (x1 + 3 * controlX1 + 3 * controlX2 + x2) / 8
+            const baseLabelY = (y1 + 3 * controlY1 + 3 * controlY2 + y2) / 8 - 42
             const labelX = baseLabelX + (arrow.labelOffset?.x ?? 0)
             const labelY = baseLabelY + (arrow.labelOffset?.y ?? 0)
-            
-            // 根据方向调整控制点，使曲线更自然
-            const controlOffset = Math.abs(y2 - y1) * 0.3
-            
-            // 增强的曲线路径 - 添加中间控制点使曲线更平滑
-            const controlX1 = x1 + (isGoingRight ? 50 : -50)
-            const controlY1 = isGoingUp ? y1 - controlOffset : y1 + controlOffset
-            const controlX2 = x2 + (isGoingLeft ? -50 : 50)
-            const controlY2 = isGoingUp ? y2 + controlOffset : y2 - controlOffset
 
             return (
               <g key={`arrow-${idx}`} style={{ zIndex: arrow.zIndex ?? 0 }}>

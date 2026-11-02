@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import type { CanvasProps, CanvasTransform } from '../types'
 import styles from './Canvas.module.css'
+import { getCanvasViewport } from '../utils/canvasViewport'
 
 const CELL_WIDTH = 70
 const CELL_HEIGHT = 55
@@ -23,7 +24,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
     const container = containerRef.current
 
     const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.35, 2.5])
+      .scaleExtent([0.15, 2.5])
       .on('zoom', (event) => {
         setTransform({
           x: event.transform.x,
@@ -35,18 +36,18 @@ export function Canvas({ step, inputData }: CanvasProps) {
     svg.call(zoom).on('dblclick.zoom', null)
 
     const fitContent = () => {
-      const contentWidth = Math.max(
-        inputData.nums.length * (CELL_WIDTH + CELL_GAP) + 340,
-        520,
-      )
-      const contentHeight = HASHMAP_Y_OFFSET + 110
       const width = svgRef.current?.clientWidth ?? container.clientWidth
       const height = svgRef.current?.clientHeight ?? container.clientHeight
       svg.attr('viewBox', `0 0 ${width} ${height}`)
-      const scale = Math.min(width / (contentWidth + 24), height / (contentHeight + 24), 1.2)
-      const initialX = 20
-      const initialY = 0
-      svg.call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY).scale(scale))
+      const viewport = getCanvasViewport({
+        width,
+        height,
+        arrayLength: inputData.nums.length,
+      })
+      svg.call(
+        zoom.transform,
+        d3.zoomIdentity.translate(viewport.x, viewport.y).scale(viewport.scale),
+      )
     }
 
     fitContent()
@@ -190,13 +191,17 @@ export function Canvas({ step, inputData }: CanvasProps) {
             const autoXOffset = totalSameTarget > 1 ? (sameTargetIdx - (totalSameTarget - 1) / 2) * 70 : 0
             const extraXOffset = pointer.offset?.x ?? 0
             const extraYOffset = pointer.offset?.y ?? 0
+            const labelWidth = pointer.label.length * 8 + 16
+            const minLabelCenter = labelWidth / 2 + 4
+            const maxLabelCenter = inputData.nums.length * (CELL_WIDTH + CELL_GAP) - labelWidth / 2 - 4
+            const pointerCenterX = Math.max(minLabelCenter, Math.min(maxLabelCenter, targetX + autoXOffset + extraXOffset))
 
-            const pointerX = targetX + autoXOffset + extraXOffset
+            const pointerX = pointerCenterX
 
             return (
               <g
                 key={`pointer-${idx}`}
-                transform={`translate(${pointerX}, ${ARRAY_Y - POINTER_AREA_HEIGHT + extraYOffset})`}
+                transform={`translate(${pointerX}, ${ARRAY_Y - POINTER_AREA_HEIGHT / 2 + extraYOffset})`}
                 style={{ zIndex: 10 }}
               >
                 {/* 指针标签背景 */}
@@ -231,7 +236,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
                   x1={0}
                   y1={8}
                   x2={targetX - pointerX}
-                  y2={POINTER_AREA_HEIGHT - 10 - extraYOffset}
+                  y2={POINTER_AREA_HEIGHT / 2 + CELL_HEIGHT / 2 - extraYOffset}
                   stroke={pointer.color}
                   strokeWidth={2.5}
                   strokeDasharray="6,3"
@@ -241,7 +246,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
                 {/* 目标位置标记圆点 */}
                 <circle
                   cx={targetX - pointerX}
-                  cy={POINTER_AREA_HEIGHT - 10 - extraYOffset}
+                  cy={POINTER_AREA_HEIGHT / 2 + CELL_HEIGHT / 2 - extraYOffset}
                   r={5}
                   fill={pointer.color}
                   opacity={0.8}

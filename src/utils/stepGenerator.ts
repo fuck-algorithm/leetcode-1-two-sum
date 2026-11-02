@@ -11,10 +11,8 @@ import type {
 
 const CELL_WIDTH = 70
 const CELL_GAP = 20
+const HASHMAP_GAP = 110
 
-/**
- * 两数之和算法的 Java 代码
- */
 export const TWO_SUM_CODE = `public int[] twoSum(int[] nums, int target) {
     Map<Integer, Integer> map = new HashMap<>();
     for (int i = 0; i < nums.length; i++) {
@@ -27,477 +25,153 @@ export const TWO_SUM_CODE = `public int[] twoSum(int[] nums, int target) {
     return new int[] {};
 }`
 
-/**
- * 生成两数之和算法的所有执行步骤（详细版）
- */
+/** Build short, visual beats: discover complement → save → match → return. */
 export function generateSteps(nums: number[], target: number): Step[] {
   const steps: Step[] = []
   const hashMap: HashMapEntry[] = []
-  let stepIndex = 0
+  const arrayWidth = nums.length * (CELL_WIDTH + CELL_GAP) + HASHMAP_GAP
+  let index = 0
 
-  const arrayWidth = nums.length * (CELL_WIDTH + CELL_GAP)
+  const add = (params: Omit<CreateStepParams, 'index' | 'nums'>) => {
+    steps.push(createStep({ ...params, index: index++, nums }))
+  }
 
-  // 步骤1: 初始化 - 展示问题
-  steps.push(
-    createStep({
-      index: stepIndex++,
-      description: '开始执行两数之和算法',
-      currentLine: 1,
-      variables: [],
-      nums,
-      hashMapState: [],
-      highlightedIndices: [],
-      annotations: [],
-      actionLabel: `🎯 目标: 找两数之和 = ${target}`,
-      statusText: `在数组中找到两个数，使它们的和等于 ${target}`,
-      algorithmHint: '核心思路: 用 HashMap 存储已遍历的数，实现 O(n) 时间复杂度',
-    })
-  )
+  add({
+    scene: 'intro',
+    description: '从左到右找一对和为目标值的数字。',
+    currentLine: 1,
+    variables: [],
+    hashMapState: [],
+    highlightedIndices: [],
+    annotations: [],
+    actionLabel: '目标',
+    statusText: `凑出 ${target}`,
+  })
 
-  // 步骤2: 创建 HashMap
-  steps.push(
-    createStep({
-      index: stepIndex++,
-      description: '创建空的 HashMap',
-      currentLine: 2,
-      variables: [],
-      nums,
-      hashMapState: [],
-      highlightedIndices: [],
-      annotations: [],
-      actionLabel: '📦 创建 HashMap<值, 索引>',
-      statusText: 'HashMap 用于存储: 数组值 → 对应索引',
-      algorithmHint: '每次遍历时，先查找补数是否在 HashMap 中',
-    })
-  )
-
-  // 遍历数组
   for (let i = 0; i < nums.length; i++) {
-    const currentNum = nums[i]
-    const complement = target - currentNum
-
-    // 步骤: 进入循环，设置 i
-    const loopVariables: VariableState[] = [{ name: 'i', value: String(i), line: 3 }]
-
-    steps.push(
-      createStep({
-        index: stepIndex++,
-        description: `循环: i = ${i}`,
-        currentLine: 3,
-        variables: loopVariables,
-        nums,
-        hashMapState: [...hashMap],
-        highlightedIndices: [],
-        annotations: [],
-        actionLabel: `🔄 循环第 ${i + 1} 轮 (i = ${i})`,
-        pointers: [{ targetIndex: i, label: `i=${i}`, color: '#ffeb3b' }],
-        statusText: `开始处理索引 ${i} 的元素`,
-        algorithmHint: `遍历进度: ${i + 1}/${nums.length}`,
-      })
-    )
-
-    // 步骤: 读取当前元素
-    steps.push(
-      createStep({
-        index: stepIndex++,
-        description: `读取 nums[${i}]`,
-        currentLine: 4,
-        variables: loopVariables,
-        nums,
-        hashMapState: [...hashMap],
-        highlightedIndices: [i],
-        annotations: [],
-        actionLabel: `👁️ 读取 nums[${i}] = ${currentNum}`,
-        pointers: [{ targetIndex: i, label: `当前值: ${currentNum}`, color: '#ffeb3b', offset: { y: -10 } }],
-        arrows: [
-          {
-            fromType: 'array',
-            fromIndex: i,
-            toType: 'calculation',
-            toIndex: 0,
-            label: `读取值`,
-            color: '#ffeb3b',
-            zIndex: 1,
-            labelOffset: { x: 20, y: -15 },
-          },
-        ],
-        statusText: `当前元素值为 ${currentNum}`,
-        algorithmHint: `需要找到另一个数 x，使得 ${currentNum} + x = ${target}`,
-      })
-    )
-
-    // 步骤: 计算补数
-    const complementVariables: VariableState[] = [
+    const value = nums[i]
+    const complement = target - value
+    const variables: VariableState[] = [
       { name: 'i', value: String(i), line: 3 },
-      { name: 'complement', value: String(complement), line: 4 },
+      { name: '补数', value: String(complement), line: 4 },
     ]
+    const matchIndex = hashMap.findIndex((entry) => entry.key === complement)
 
-    steps.push(
-      createStep({
-        index: stepIndex++,
-        description: `计算补数`,
-        currentLine: 4,
-        variables: complementVariables,
-        nums,
-        hashMapState: [...hashMap],
-        highlightedIndices: [i],
-        annotations: [],
-        actionLabel: '🧮 计算补数 complement',
-        pointers: [{ targetIndex: i, label: `${currentNum}`, color: '#ffeb3b', offset: { y: -10 } }],
-        calculation: {
-          expression: `complement = ${target} - ${currentNum}`,
-          result: `= ${complement}`,
-          x: arrayWidth + 30,
-          y: 0,
-        },
-        arrows: [
-          {
-            fromType: 'array',
-            fromIndex: i,
-            toType: 'calculation',
-            toIndex: 0,
-            label: `计算补数`,
-            color: '#ffeb3b',
-            zIndex: 1,
-            labelOffset: { x: 20, y: -10 },
-          },
-        ],
-        statusText: `计算: complement = ${target} - ${currentNum} = ${complement}`,
-        algorithmHint: `如果 HashMap 中存在 ${complement}，则找到答案！`,
-      })
-    )
+    if (matchIndex >= 0) {
+      const previousIndex = hashMap[matchIndex].value
+      const foundEntry = hashMap.map((entry) => ({ ...entry, isNew: entry.key === complement }))
+      const pointers: PointerAnnotation[] = [
+        { targetIndex: previousIndex, label: `${nums[previousIndex]}`, color: '#4caf50' },
+        { targetIndex: i, label: `${value}`, color: '#e9b86e' },
+      ]
 
-    // 检查 HashMap 中是否存在补数
-    const hasComplement = hashMap.some((entry) => entry.key === complement)
-    const complementMapIndex = hashMap.findIndex((entry) => entry.key === complement)
-
-    // 步骤: 在 HashMap 中查找补数
-    steps.push(
-      createStep({
-        index: stepIndex++,
-        description: `查找补数 ${complement}`,
+      add({
+        scene: 'scan',
+        description: `查看 ${value}，它需要 ${complement}；这个数已经保存。`,
         currentLine: 5,
-        variables: complementVariables,
-        nums,
-        hashMapState: hashMap.map((entry) => ({
-          ...entry,
-          isNew: entry.key === complement,
-        })),
+        variables,
+        hashMapState: foundEntry,
         highlightedIndices: [i],
         annotations: [],
-        actionLabel: `🔍 在 HashMap 中查找 ${complement}`,
-        pointers: [{ targetIndex: i, label: `当前`, color: '#ffeb3b' }],
-        calculation: {
-          expression: `map.containsKey(${complement})`,
-          result: hasComplement ? '✅ true - 找到了!' : '❌ false - 不存在',
-          x: arrayWidth + 30,
-          y: 0,
-        },
-        // 数据流：用箭头明确「计算出的 complement」去 HashMap 查找
-        arrows: [
-          {
-            fromType: 'calculation',
-            fromIndex: 0,
-            toType: 'hashmap',
-            toIndex: Math.max(0, complementMapIndex),
-            label: `查找 ${complement}`,
-            color: '#ff9800',
-            zIndex: 2,
-            labelOffset: { x: -80, y: -30 },
-          },
-        ],
-        statusText: hasComplement
-          ? `🎉 HashMap 中存在 ${complement}！`
-          : `HashMap 中不存在 ${complement}`,
-        algorithmHint: hasComplement
-          ? '补数存在，可以返回结果了！'
-          : '补数不存在，需要将当前值存入 HashMap',
+        actionLabel: `找 ${complement}`,
+        pointers,
+        calculation: { expression: `${target} − ${value}`, result: `${complement}`, x: arrayWidth, y: 0 },
+        arrows: [],
+        statusText: '已保存',
       })
-    )
 
-    if (hasComplement) {
-      const complementIndex = hashMap.find((entry) => entry.key === complement)!.value
+      add({
+        scene: 'match',
+        description: `${nums[previousIndex]} 和 ${value} 正好凑成 ${target}。`,
+        currentLine: 6,
+        variables: [...variables, { name: '结果', value: `[${previousIndex}, ${i}]`, line: 6 }],
+        hashMapState: foundEntry,
+        highlightedIndices: [previousIndex, i],
+        annotations: [],
+        actionLabel: '配对成功',
+        pointers,
+        calculation: { expression: `${nums[previousIndex]} + ${value}`, result: `${target}`, x: arrayWidth, y: 0 },
+        statusText: `${previousIndex} + ${i} = ${target}`,
+      })
 
-      // 步骤: 找到补数，获取索引
-      steps.push(
-        createStep({
-          index: stepIndex++,
-          description: `找到补数!`,
-          currentLine: 5,
-          variables: complementVariables,
-          nums,
-          hashMapState: hashMap.map((entry) => ({
-            ...entry,
-            isNew: entry.key === complement,
-          })),
-          highlightedIndices: [complementIndex, i],
-          annotations: [],
-          actionLabel: `🎯 找到补数 ${complement} 在索引 ${complementIndex}`,
-          pointers: [
-            { targetIndex: complementIndex, label: `补数${complement}`, color: '#4caf50', offset: { y: -15 } },
-            { targetIndex: i, label: `当前${currentNum}`, color: '#ffeb3b', offset: { y: -15 } },
-          ],
-          arrows: [
-            {
-              fromType: 'hashmap',
-              fromIndex: complementMapIndex,
-              toType: 'array',
-              toIndex: complementIndex,
-              label: `返回索引${complementIndex}`,
-              color: '#4caf50',
-              zIndex: 3,
-              labelOffset: { x: -70, y: -35 },
-            },
-          ],
-          statusText: `从 HashMap 获取 ${complement} 的索引: ${complementIndex}`,
-          algorithmHint: '通过 HashMap 的 O(1) 查找，快速定位补数位置',
-        })
-      )
-
-      // 步骤: 验证两数之和
-      steps.push(
-        createStep({
-          index: stepIndex++,
-          description: `验证结果`,
-          currentLine: 6,
-          variables: [
-            ...complementVariables,
-            { name: 'result', value: `[${complementIndex}, ${i}]`, line: 6 },
-          ],
-          nums,
-          hashMapState: hashMap.map((entry) => ({
-            ...entry,
-            isNew: entry.key === complement,
-          })),
-          highlightedIndices: [complementIndex, i],
-          annotations: [],
-          actionLabel: `✅ 验证: ${nums[complementIndex]} + ${currentNum} = ${target}`,
-          pointers: [
-            { targetIndex: complementIndex, label: `数1=${nums[complementIndex]}`, color: '#4caf50', offset: { y: -20 } },
-            { targetIndex: i, label: `数2=${currentNum}`, color: '#4caf50', offset: { y: -20 } },
-          ],
-          calculation: {
-            expression: `${nums[complementIndex]} + ${currentNum}`,
-            result: `= ${target} ✅`,
-            x: arrayWidth + 30,
-            y: 0,
-          },
-          arrows: [
-            {
-              fromType: 'array',
-              fromIndex: complementIndex,
-              toType: 'calculation',
-              toIndex: 0,
-              label: `数值${nums[complementIndex]}`,
-              color: '#4caf50',
-              zIndex: 3,
-              labelOffset: { x: 20, y: -12 },
-            },
-            {
-              fromType: 'array',
-              fromIndex: i,
-              toType: 'calculation',
-              toIndex: 1,
-              label: `数值${currentNum}`,
-              color: '#4caf50',
-              zIndex: 3,
-              labelOffset: { x: 20, y: 12 },
-            },
-          ],
-          statusText: `验证成功: nums[${complementIndex}] + nums[${i}] = ${nums[complementIndex]} + ${currentNum} = ${target}`,
-          algorithmHint: '两数之和等于目标值，找到答案！',
-        })
-      )
-
-      // 步骤: 返回结果
-      steps.push(
-        createStep({
-          index: stepIndex++,
-          description: `返回答案`,
-          currentLine: 6,
-          variables: [
-            ...complementVariables,
-            { name: 'result', value: `[${complementIndex}, ${i}]`, line: 6 },
-          ],
-          nums,
-          hashMapState: hashMap.map((entry) => ({
-            ...entry,
-            isNew: entry.key === complement,
-          })),
-          highlightedIndices: [complementIndex, i],
-          annotations: [],
-          actionLabel: `🎉 答案: [${complementIndex}, ${i}]`,
-          pointers: [
-            { targetIndex: complementIndex, label: `索引${complementIndex}`, color: '#4caf50', offset: { y: -25 } },
-            { targetIndex: i, label: `索引${i}`, color: '#4caf50', offset: { y: -25 } },
-          ],
-          calculation: {
-            expression: `return [${complementIndex}, ${i}]`,
-            result: `✅ 算法完成`,
-            x: arrayWidth + 30,
-            y: 0,
-          },
-          statusText: `返回索引数组 [${complementIndex}, ${i}]`,
-          algorithmHint: `时间复杂度 O(n)，空间复杂度 O(n)`,
-        })
-      )
-
+      add({
+        scene: 'result',
+        description: `返回这两个位置：${previousIndex} 和 ${i}。`,
+        currentLine: 6,
+        variables: [{ name: '结果', value: `[${previousIndex}, ${i}]`, line: 6 }],
+        hashMapState: foundEntry,
+        highlightedIndices: [previousIndex, i],
+        annotations: [],
+        actionLabel: `答案：${previousIndex}、${i}`,
+        pointers: [
+          { targetIndex: previousIndex, label: `${previousIndex}`, color: '#8fd5b5' },
+          { targetIndex: i, label: `${i}`, color: '#8fd5b5' },
+        ],
+        calculation: { expression: `${nums[previousIndex]} + ${value}`, result: `${target} ✓`, x: arrayWidth, y: 0 },
+        statusText: '返回下标',
+      })
       return steps
     }
 
-    // 步骤: 未找到补数
-    steps.push(
-      createStep({
-        index: stepIndex++,
-        description: `未找到补数`,
-        currentLine: 5,
-        variables: complementVariables,
-        nums,
-        hashMapState: [...hashMap],
-        highlightedIndices: [i],
-        annotations: [],
-        actionLabel: `❌ HashMap 中无 ${complement}`,
-        pointers: [{ targetIndex: i, label: `当前: ${currentNum}`, color: '#ffeb3b' }],
-        statusText: `补数 ${complement} 不在 HashMap 中，需要存储当前值`,
-        algorithmHint: '将当前值存入 HashMap，供后续元素查找',
-      })
-    )
+    add({
+      scene: 'scan',
+      description: `查看 ${value}；要凑成 ${target}，还差 ${complement}。`,
+      currentLine: 4,
+      variables,
+      hashMapState: [...hashMap],
+      highlightedIndices: [i],
+      annotations: [],
+      actionLabel: `找 ${complement}`,
+      pointers: [{ targetIndex: i, label: `${value}`, color: '#e9b86e' }],
+      calculation: { expression: `${target} − ${value}`, result: `${complement}`, x: arrayWidth, y: 0 },
+      arrows: [{
+        fromType: 'array', fromIndex: i, toType: 'calculation', toIndex: 0,
+        label: '', color: '#e9b86e', zIndex: 1,
+      }],
+      statusText: '还没找到',
+    })
 
-    // 步骤: 准备存入 HashMap
-    steps.push(
-      createStep({
-        index: stepIndex++,
-        description: `准备存入 HashMap`,
-        currentLine: 8,
-        variables: complementVariables,
-        nums,
-        hashMapState: [...hashMap],
-        highlightedIndices: [i],
-        annotations: [],
-        actionLabel: `📝 准备存入: map.put(${currentNum}, ${i})`,
-        pointers: [{ targetIndex: i, label: `值${currentNum}`, color: '#2196f3', offset: { y: -12 } }],
-        calculation: {
-          expression: `map.put(${currentNum}, ${i})`,
-          result: `准备写入 HashMap`,
-          x: arrayWidth + 30,
-          y: 0,
-        },
-        // 数据流：从当前数组元素（key）写入 HashMap
-        arrows: [
-          {
-            fromType: 'array',
-            fromIndex: i,
-            toType: 'calculation',
-            toIndex: 0,
-            label: `key=${currentNum}`,
-            color: '#2196f3',
-            zIndex: 2,
-            labelOffset: { x: 20, y: -10 },
-          },
-          {
-            fromType: 'calculation',
-            fromIndex: 0,
-            toType: 'hashmap',
-            toIndex: Math.max(0, hashMap.length),
-            label: `写入操作`,
-            color: '#ff9800',
-            zIndex: 2,
-            labelOffset: { x: -70, y: -25 },
-          },
-        ],
-        statusText: `将 ${currentNum} 作为 key，${i} 作为 value 存入 HashMap`,
-        algorithmHint: '存储格式: 数组值 → 索引，方便后续通过值查找索引',
-      })
-    )
-
-    // 将当前元素加入 HashMap
-    const newMapIndex = hashMap.length
-    hashMap.push({ key: currentNum, value: i, isNew: true })
-
-    // 步骤: 存入完成
-    steps.push(
-      createStep({
-        index: stepIndex++,
-        description: `存入完成`,
-        currentLine: 8,
-        variables: complementVariables,
-        nums,
-        hashMapState: hashMap.map((entry, idx) => ({
-          ...entry,
-          isNew: idx === hashMap.length - 1,
-        })),
-        highlightedIndices: [i],
-        annotations: [],
-        actionLabel: `✅ 已存入 map[${currentNum}] = ${i}`,
-        pointers: [{ targetIndex: i, label: `完成`, color: '#4caf50', offset: { y: -12 } }],
-        calculation: {
-          expression: `HashMap[${newMapIndex}]`,
-          result: `${currentNum} → ${i} ✓`,
-          x: arrayWidth + 30,
-          y: 0,
-        },
-        arrows: [
-          {
-            fromType: 'hashmap',
-            fromIndex: newMapIndex,
-            toType: 'calculation',
-            toIndex: 0,
-            label: `确认存入`,
-            color: '#4caf50',
-            zIndex: 3,
-            labelOffset: { x: 15, y: -15 },
-          },
-        ],
-        statusText: `HashMap 新增条目: key=${currentNum}, value=${i}`,
-        algorithmHint: `HashMap 当前大小: ${hashMap.length}`,
-      })
-    )
-
-    // 清除 isNew 标记
+    hashMap.push({ key: value, value: i, isNew: true })
+    add({
+      scene: 'write',
+      description: `先记住 ${value} 在位置 ${i}，后面可以用它配对。`,
+      currentLine: 8,
+      variables,
+      hashMapState: hashMap.map((entry, entryIndex) => ({
+        ...entry,
+        isNew: entryIndex === hashMap.length - 1,
+      })),
+      highlightedIndices: [i],
+      annotations: [],
+      actionLabel: `记住 ${value}`,
+      pointers: [{ targetIndex: i, label: `${value}`, color: '#8fd5b5' }],
+      arrows: [{
+        fromType: 'array', fromIndex: i, toType: 'hashmap', toIndex: hashMap.length - 1,
+        label: '', color: '#8fd5b5', zIndex: 2,
+      }],
+      statusText: `位置 ${i}`,
+    })
     hashMap[hashMap.length - 1].isNew = false
-
-    // 如果不是最后一个元素，添加继续循环的步骤
-    if (i < nums.length - 1) {
-      steps.push(
-        createStep({
-          index: stepIndex++,
-          description: `继续下一轮`,
-          currentLine: 3,
-          variables: [{ name: 'i', value: String(i), line: 3 }],
-          nums,
-          hashMapState: [...hashMap],
-          highlightedIndices: [],
-          annotations: [],
-          actionLabel: `➡️ i++ 继续循环`,
-          statusText: `索引 ${i} 处理完成，准备处理索引 ${i + 1}`,
-          algorithmHint: `已处理 ${i + 1}/${nums.length} 个元素`,
-        })
-      )
-    }
   }
 
-  // 如果遍历完都没找到，返回空数组
-  steps.push(
-    createStep({
-      index: stepIndex++,
-      description: '未找到结果',
-      currentLine: 10,
-      variables: [],
-      nums,
-      hashMapState: [...hashMap],
-      highlightedIndices: [],
-      annotations: [],
-      actionLabel: '⚠️ 遍历完成，无解',
-      statusText: '数组中不存在两个数的和等于目标值',
-      algorithmHint: '返回空数组表示无解',
-    })
-  )
+  add({
+    scene: 'result',
+    description: '遍历结束，没有找到符合条件的一对。',
+    currentLine: 10,
+    variables: [],
+    hashMapState: [...hashMap],
+    highlightedIndices: [],
+    annotations: [],
+    actionLabel: '没有配对',
+    statusText: '返回空数组',
+  })
 
   return steps
 }
 
 interface CreateStepParams {
   index: number
+  scene: Step['scene']
   description: string
   currentLine: number
   variables: VariableState[]
@@ -510,58 +184,26 @@ interface CreateStepParams {
   arrows?: ArrowConnection[]
   calculation?: CalculationDisplay
   statusText?: string
-  algorithmHint?: string
 }
 
 function createStep(params: CreateStepParams): Step {
-  const {
-    index,
-    description,
-    currentLine,
-    variables,
-    nums,
-    hashMapState,
-    highlightedIndices,
-    annotations,
-    actionLabel,
-    pointers,
-    arrows,
-    calculation,
-    statusText,
-    algorithmHint,
-  } = params
-
-  const arrayState: ArrayElementState[] = nums.map((value, idx) => ({
+  const arrayState: ArrayElementState[] = params.nums.map((value, idx) => ({
     index: idx,
     value,
-    isHighlighted: highlightedIndices.includes(idx),
-    highlightColor: highlightedIndices.includes(idx) ? '#4CAF50' : undefined,
+    isHighlighted: params.highlightedIndices.includes(idx),
+    highlightColor: params.highlightedIndices.includes(idx) ? '#8fd5b5' : undefined,
   }))
 
   return {
-    index,
-    description,
-    currentLine,
-    variables,
+    ...params,
     arrayState,
-    hashMapState: [...hashMapState],
-    highlightedIndices,
-    annotations,
-    actionLabel,
-    pointers,
-    arrows,
-    calculation,
-    statusText,
-    algorithmHint,
+    hashMapState: [...params.hashMapState],
   }
 }
 
-/**
- * 从步骤中提取最终结果
- */
 export function getResultFromSteps(steps: Step[]): [number, number] | null {
   const lastStep = steps[steps.length - 1]
-  if (lastStep.highlightedIndices.length === 2) {
+  if (lastStep?.highlightedIndices.length === 2) {
     return [lastStep.highlightedIndices[0], lastStep.highlightedIndices[1]]
   }
   return null

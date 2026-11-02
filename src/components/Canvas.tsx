@@ -7,10 +7,10 @@ import { getCanvasViewport } from '../utils/canvasViewport'
 const CELL_WIDTH = 70
 const CELL_HEIGHT = 55
 const CELL_GAP = 20
-const ARRAY_Y = 260
-const HASHMAP_Y_OFFSET = 450
+const ARRAY_Y = 220
+const HASHMAP_Y_OFFSET = 320
 const POINTER_AREA_HEIGHT = 80
-const STATUS_AREA_Y = 30
+const STATUS_AREA_Y = 90
 
 export function Canvas({ step, inputData }: CanvasProps) {
   const svgRef = useRef<SVGSVGElement>(null)
@@ -100,83 +100,31 @@ export function Canvas({ step, inputData }: CanvasProps) {
         </defs>
 
         <g transform={`translate(${transform.x}, ${transform.y}) scale(${transform.scale})`}>
-          {/* 集中说明区域：状态展示面板 */}
-          {(step.actionLabel || step.statusText || step.algorithmHint) && (
-            <g transform={`translate(0, ${STATUS_AREA_Y})`} style={{ zIndex: 100 }}>
-              <g>
-                {/* 面板背景 */}
-                <rect
-                  x={-15}
-                  y={-25}
-                  width={Math.max(
-                    260,
-                    (step.actionLabel?.length || 0) * 9 + 70,
-                    (step.statusText?.length || 0) * 9 + 70,
-                    (step.algorithmHint?.length || 0) * 9 + 70
-                  )}
-                  height={100}
-                  rx={12}
-                  className={styles.statusBg}
-                />
-
-                {/* 面板标题装饰 */}
-                <circle cx={-2} cy={-12} r={3} fill="#4caf50" opacity={0.8} />
-                <circle cx={10} cy={-12} r={3} fill="#ffeb3b" opacity={0.8} />
-                <circle cx={22} cy={-12} r={3} fill="#2196f3" opacity={0.8} />
-
-                {/* 当前操作标签 */}
-                {step.actionLabel && (
-                  <>
-                    <text x={8} y={8} className={styles.statusSectionLabel}>
-                      当前操作
-                    </text>
-                    <text x={8} y={26} className={styles.actionLabel}>
-                      {step.actionLabel}
-                    </text>
-                  </>
-                )}
-
-                {/* 状态说明 */}
-                {step.statusText && (
-                  <>
-                    <text x={8} y={42} className={styles.statusSectionLabel}>
-                      💡 状态说明
-                    </text>
-                    <text x={8} y={58} className={styles.statusText}>
-                      {step.statusText}
-                    </text>
-                  </>
-                )}
-
-                {/* 算法提示 */}
-                {step.algorithmHint && (
-                  <text x={8} y={74} className={styles.hintText}>
-                    🔍 {step.algorithmHint}
-                  </text>
-                )}
-
-                {/* 装饰边框 */}
-                <line
-                  x1={-10}
-                  y1={0}
-                  x2={Math.max(
-                    250,
-                    (step.actionLabel?.length || 0) * 9 + 60,
-                    (step.statusText?.length || 0) * 9 + 60,
-                    (step.algorithmHint?.length || 0) * 9 + 60
-                  )}
-                  y2={0}
-                  stroke="#4caf50"
-                  strokeWidth={1}
-                  opacity={0.3}
-                />
-              </g>
+          <g className={styles.lessonLayer}>
+          {/* 操作名用一个短词，解释留给代码与解说；不要把整段文案塞进画布。 */}
+          {step.actionLabel && (
+            <g
+              transform={`translate(${Math.max(0, Math.min(inputData.nums.length * (CELL_WIDTH + CELL_GAP) - 150, getCellX(step.highlightedIndices[0] ?? 0)))}, ${STATUS_AREA_Y})`}
+              style={{ zIndex: 100 }}
+            >
+              <rect
+                x={-15}
+                y={-25}
+                width={Math.max(110, step.actionLabel.length * 12 + 32)}
+                height={34}
+                rx={17}
+                className={styles.operationPill}
+              />
+              <circle cx={2} cy={-8} r={3} className={styles.operationDot} />
+              <text x={12} y={4} className={styles.actionLabel}>
+                {step.actionLabel}
+              </text>
             </g>
           )}
 
           {/* 数组标题 */}
           <text x={0} y={ARRAY_Y - 30} className={styles.sectionTitle}>
-            📊 数组 nums (长度: {inputData.nums.length})
+            nums
           </text>
 
           {/* 指针标注 - 增加状态标识 */}
@@ -318,55 +266,30 @@ export function Canvas({ step, inputData }: CanvasProps) {
             )
           })}
 
-          {/* 计算展示区域 - 放在数组右侧，增加状态标识 */}
-          {step.calculation && (
-            <g transform={`translate(${step.calculation.x}, ${ARRAY_Y - 10})`} style={{ zIndex: 5 }}>
-              {/* 计算区域背景 */}
+          {step.calculation && step.scene !== 'write' && (
+            <g
+              className={styles.calculationLayer}
+              transform={`translate(${step.calculation.x}, ${ARRAY_Y - 10})`}
+              style={{ zIndex: 5 }}
+            >
               <rect
                 x={-15}
                 y={-25}
-                width={280}
+                width={260}
                 height={90}
                 rx={10}
                 className={styles.calculationBg}
               />
-              {/* 计算区域标题 */}
-              <text x={5} y={-8} className={styles.calculationTitle}>
-                💭 计算过程
-              </text>
-              {/* 分隔线 */}
-              <line
-                x1={-10}
-                y1={0}
-                x2={260}
-                y2={0}
-                stroke="#2196f3"
-                strokeWidth={1}
-                opacity={0.3}
-              />
-              {/* 计算表达式 */}
               <text x={5} y={20} className={styles.calculationExpr}>
                 {step.calculation.expression}
               </text>
-              {/* 计算结果 */}
-              <text x={5} y={48} className={styles.calculationResult}>
+              <text x={5} y={52} className={styles.calculationResult}>
                 {step.calculation.result}
-              </text>
-              {/* 装饰性图标 */}
-              <circle
-                cx={245}
-                cy={30}
-                r={8}
-                fill="none"
-                stroke="#2196f3"
-                strokeWidth={2}
-                className={styles.calculationIcon}
-              />
-              <text x={245} y={35} className={styles.calculationIconText}>
-                ✓
               </text>
             </g>
           )}
+
+          </g>
 
           {/* 箭头连接 */}
           {step.arrows
@@ -509,10 +432,12 @@ export function Canvas({ step, inputData }: CanvasProps) {
             )
           })}
 
-          {/* HashMap 标题 */}
-          <text x={0} y={HASHMAP_Y_OFFSET - 25} className={styles.sectionTitle}>
-            🗂️ HashMap (值 → 索引) | 条目数: {step.hashMapState.length}
-          </text>
+          {/* 已看过的数字是后续配对的查找表。 */}
+          {step.hashMapState.length > 0 && (
+            <text x={0} y={HASHMAP_Y_OFFSET - 25} className={styles.sectionTitle}>
+              已记住
+            </text>
+          )}
 
           {/* HashMap 条目 - 增加状态标识 */}
           {step.hashMapState.length === 0 ? (
@@ -529,7 +454,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
                 strokeDasharray="4,2"
               />
               <text x={40} y={0} className={styles.emptyText}>
-                (空)
+                等第一个
               </text>
             </g>
           ) : (
@@ -537,7 +462,19 @@ export function Canvas({ step, inputData }: CanvasProps) {
               const x = index * (CELL_WIDTH + CELL_GAP)
 
               return (
-                <g key={index} transform={`translate(${x}, ${HASHMAP_Y_OFFSET})`}>
+                <g key={index} transform={`translate(${x}, ${HASHMAP_Y_OFFSET + index * 48})`} className={entry.isNew ? styles.hashEntryNew : styles.hashEntry}>
+                  {entry.isNew && (
+                    <path
+                      d={`M ${CELL_WIDTH / 2} -58 C ${CELL_WIDTH / 2} -42, ${CELL_WIDTH / 2} -24, ${CELL_WIDTH / 2} -4`}
+                      fill="none"
+                      stroke="#8fd5b5"
+                      strokeWidth={2}
+                      strokeDasharray="4 4"
+                      markerEnd="url(#arrowhead-green)"
+                      className={styles.insertTrail}
+                      aria-label={`保存 ${entry.key}`}
+                    />
+                  )}
                   {/* HashMap 条目背景 */}
                   <rect
                     x={0}

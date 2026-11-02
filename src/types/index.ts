@@ -102,6 +102,7 @@ export interface PointerAnnotation {
 // 算法步骤
 export interface Step {
   index: number
+  scene: 'intro' | 'scan' | 'write' | 'match' | 'result'
   description: string
   currentLine: number
   variables: VariableState[]

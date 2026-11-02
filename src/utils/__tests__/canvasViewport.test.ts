@@ -10,8 +10,8 @@ describe('getCanvasViewport', () => {
     const viewport = getCanvasViewport({ width, height, arrayLength: 4 })
     const sceneLeft = -65
     const sceneRight = Math.max(700, 4 * 90 + 340)
-    const sceneTop = -25
-    const sceneBottom = 450 + 70 + 50
+    const sceneTop = 45
+    const sceneBottom = 320 + 3 * 48 + 70 + 45
     const centerX = viewport.x + ((sceneLeft + sceneRight) / 2) * viewport.scale
     const centerY = viewport.y + ((sceneTop + sceneBottom) / 2) * viewport.scale
 

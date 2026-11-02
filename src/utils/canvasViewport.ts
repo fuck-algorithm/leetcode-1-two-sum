@@ -14,10 +14,10 @@ interface CanvasViewportOptions {
 
 const CELL_WIDTH = 70
 const CELL_GAP = 20
-const HASHMAP_Y_OFFSET = 450
-const HASHMAP_CAPTION_GAP = 50
+const HASHMAP_Y_OFFSET = 320
+const HASHMAP_CAPTION_GAP = 45
 const SCENE_LEFT = -65
-const SCENE_TOP = -25
+const SCENE_TOP = 45
 const MIN_SCENE_WIDTH = 700
 const SCENE_RIGHT_PADDING = 340
 const VIEWPORT_PADDING = 24
@@ -33,7 +33,7 @@ export function getCanvasViewport({
   const pitch = CELL_WIDTH + CELL_GAP
   const arrayWidth = arrayLength * pitch
   const sceneRight = Math.max(MIN_SCENE_WIDTH, arrayWidth + SCENE_RIGHT_PADDING)
-  const sceneBottom = HASHMAP_Y_OFFSET + CELL_WIDTH + HASHMAP_CAPTION_GAP
+  const sceneBottom = HASHMAP_Y_OFFSET + Math.max(0, arrayLength - 1) * 48 + CELL_WIDTH + HASHMAP_CAPTION_GAP
   const sceneWidth = sceneRight - SCENE_LEFT
   const sceneHeight = sceneBottom - SCENE_TOP
   const availableWidth = Math.max(0, width - VIEWPORT_PADDING * 2)

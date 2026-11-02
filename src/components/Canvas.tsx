@@ -191,10 +191,14 @@ export function Canvas({ step, inputData }: CanvasProps) {
             const autoXOffset = totalSameTarget > 1 ? (sameTargetIdx - (totalSameTarget - 1) / 2) * 70 : 0
             const extraXOffset = pointer.offset?.x ?? 0
             const extraYOffset = pointer.offset?.y ?? 0
-            const labelWidth = pointer.label.length * 8 + 16
-            const minLabelCenter = labelWidth / 2 + 4
-            const maxLabelCenter = inputData.nums.length * (CELL_WIDTH + CELL_GAP) - labelWidth / 2 - 4
-            const pointerCenterX = Math.max(minLabelCenter, Math.min(maxLabelCenter, targetX + autoXOffset + extraXOffset))
+            const labelHalfWidth = pointer.label.length * 4 + 8
+            const pointerCenterX = Math.max(
+              labelHalfWidth + 4,
+              Math.min(
+                inputData.nums.length * (CELL_WIDTH + CELL_GAP) - labelHalfWidth - 4,
+                targetX + autoXOffset + extraXOffset,
+              ),
+            )
 
             const pointerX = pointerCenterX
 
@@ -236,7 +240,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
                   x1={0}
                   y1={8}
                   x2={targetX - pointerX}
-                  y2={POINTER_AREA_HEIGHT / 2 + CELL_HEIGHT / 2 - extraYOffset}
+                  y2={POINTER_AREA_HEIGHT / 2 + CELL_HEIGHT / 2 + 4 - extraYOffset}
                   stroke={pointer.color}
                   strokeWidth={2.5}
                   strokeDasharray="6,3"
@@ -377,7 +381,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
               y1 = ARRAY_Y + CELL_HEIGHT + 5
             } else if (arrow.fromType === 'hashmap') {
               x1 = arrow.fromIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y1 = HASHMAP_Y_OFFSET
+              y1 = HASHMAP_Y_OFFSET + CELL_HEIGHT / 2
             } else if (arrow.fromType === 'calculation') {
               // Calculation 右侧边缘是数据流出口，按行错开多个来源。
               x1 = (step.calculation?.x ?? 0) + 265
@@ -406,12 +410,21 @@ export function Canvas({ step, inputData }: CanvasProps) {
             const isGoingUp = y1 > y2
             const isGoingRight = x2 > x1
             const isGoingLeft = x2 < x1
+            const isVerticalFlow = arrow.fromType === 'hashmap' || arrow.toType === 'hashmap'
             const controlOffset = Math.max(36, Math.abs(y2 - y1) * 0.42)
-            // 曲线离开计算框时先向外绕行，避免穿过表达式与结果。
-            const controlX1 = x1 + (arrow.fromType === 'calculation' ? 64 : isGoingRight ? 50 : -50)
-            const controlX2 = x2 + (arrow.toType === 'calculation' ? -64 : isGoingLeft ? -50 : 50)
-            const controlY1 = y1 + (isGoingUp ? -controlOffset : controlOffset)
-            const controlY2 = y2 + (isGoingUp ? controlOffset : -controlOffset)
+            // Keep transfer arrows in a vertical lane between the source and destination.
+            const controlX1 = isVerticalFlow
+              ? x1 + (x2 - x1) * 0.15
+              : x1 + (arrow.fromType === 'calculation' ? 64 : isGoingRight ? 50 : -50)
+            const controlX2 = isVerticalFlow
+              ? x1 + (x2 - x1) * 0.85
+              : x2 + (arrow.toType === 'calculation' ? -64 : isGoingLeft ? -50 : 50)
+            const controlY1 = isVerticalFlow
+              ? y1 + (y2 - y1) * 0.35
+              : y1 + (isGoingUp ? -controlOffset : controlOffset)
+            const controlY2 = isVerticalFlow
+              ? y1 + (y2 - y1) * 0.65
+              : y2 + (isGoingUp ? controlOffset : -controlOffset)
             const baseLabelX = (x1 + 3 * controlX1 + 3 * controlX2 + x2) / 8
             const baseLabelY = (y1 + 3 * controlY1 + 3 * controlY2 + y2) / 8 - 42
             const labelX = baseLabelX + (arrow.labelOffset?.x ?? 0)

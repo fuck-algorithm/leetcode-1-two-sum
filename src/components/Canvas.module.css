@@ -28,7 +28,7 @@
 .svg:active { cursor: grabbing; }
 .sectionTitle { fill: #91a29f; font-size: 13px; font-weight: 600; }
 .actionLabelBg { fill: #e9b86e; }
-.actionLabel { fill: #13201f; font-size: 13px; font-weight: 700; text-anchor: middle; }
+.actionLabel { fill: #e9b86e; font-size: 13px; font-weight: 700; text-anchor: start; }
 .pointerLabel { font-size: 12px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
 .pointerLabelBg { filter: drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
 .pointerArrow { filter: drop-shadow(0 1px 2px rgba(0,0,0,.3)); }

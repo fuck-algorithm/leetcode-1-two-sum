@@ -90,7 +90,7 @@ export function generateSteps(nums: number[], target: number): Step[] {
         highlightedIndices: [],
         annotations: [],
         actionLabel: `🔄 循环第 ${i + 1} 轮 (i = ${i})`,
-        pointers: [{ targetIndex: i, label: `i = ${i}`, color: '#ffeb3b' }],
+        pointers: [{ targetIndex: i, label: `i=${i}`, color: '#ffeb3b' }],
         statusText: `开始处理索引 ${i} 的元素`,
         algorithmHint: `遍历进度: ${i + 1}/${nums.length}`,
       })

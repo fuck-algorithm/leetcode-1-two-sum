@@ -1,7 +1,19 @@
 import { describe, expect, it } from 'vitest'
-import { getArrayCellPosition, getHashMapEntryPosition, getCalculationX, getSceneBounds, CELL_GAP, CELL_HEIGHT, CELL_WIDTH, HASHMAP_ROW_PITCH } from '../canvasLayout'
+import { getArrayCellPosition, getHashMapEntryPosition, getCalculationX, getSceneBounds, layoutPointerLabels, CELL_GAP, CELL_HEIGHT, CELL_WIDTH, HASHMAP_ROW_PITCH } from '../canvasLayout'
 
 describe('canvas layout coordinates', () => {
+  it('places same-cell pointer labels on separate rows with a visible gap', () => {
+    const labels = layoutPointerLabels([150, 150, 150], ['补数 2', '当前 7', '目标'], -65, 350)
+    for (let i = 0; i < labels.length; i++) {
+      for (let j = i + 1; j < labels.length; j++) {
+        const a = labels[i]
+        const b = labels[j]
+        const overlapX = a.x < b.x + b.width + 8 && a.x + a.width + 8 > b.x
+        const overlapY = a.y < b.y + b.height + 4 && a.y + a.height + 4 > b.y
+        expect(overlapX && overlapY).toBe(false)
+      }
+    }
+  })
   it('keeps every array cell in one stable row with a visible gap', () => {
     const cells = Array.from({ length: 10 }, (_, index) => getArrayCellPosition(index))
 

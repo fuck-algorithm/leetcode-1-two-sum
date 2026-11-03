@@ -8,6 +8,7 @@ import {
   getArrayCellPosition,
   getHashMapEntryPosition,
   getCalculationX,
+  layoutPointerLabels,
   CELL_WIDTH,
   CELL_HEIGHT,
   CELL_GAP,
@@ -17,7 +18,6 @@ import {
 } from '../utils/canvasLayout'
 
 const STATUS_AREA_Y = 90
-const LABEL_GAP = 12
 
 export function Canvas({ step, inputData }: CanvasProps) {
   const svgRef = useRef<SVGSVGElement>(null)
@@ -68,13 +68,18 @@ export function Canvas({ step, inputData }: CanvasProps) {
   }, [inputData.nums.length])
 
   const getCellX = (index: number) => getArrayCellPosition(index).x + CELL_WIDTH / 2
-  const getLabelCenterX = (index: number, label: string) => {
-    const target = getCellX(index)
-    const halfWidth = label.length * 4 + 8
-    const left = -65 + halfWidth + LABEL_GAP
-    const right = inputData.nums.length * (CELL_WIDTH + CELL_GAP) - halfWidth - LABEL_GAP
-    return Math.max(left, Math.min(right, target))
-  }
+  const operationPosition = layoutPointerLabels(
+    [getCellX(step.highlightedIndices[0] ?? 0)],
+    [step.actionLabel ?? ''],
+    -65,
+    inputData.nums.length * (CELL_WIDTH + CELL_GAP),
+  )[0]
+  const pointerPositions = layoutPointerLabels(
+    (step.pointers ?? []).map((pointer) => getCellX(pointer.targetIndex) + (pointer.offset?.x ?? 0)),
+    (step.pointers ?? []).map((pointer) => pointer.label),
+    -65,
+    inputData.nums.length * (CELL_WIDTH + CELL_GAP),
+  )
 
   return (
     <div ref={containerRef} className={styles.container}>
@@ -118,7 +123,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
           {/* 操作名用一个短词，解释留给代码与解说；不要把整段文案塞进画布。 */}
           {step.actionLabel && (
             <g
-              transform={`translate(${getLabelCenterX(step.highlightedIndices[0] ?? 0, step.actionLabel)}, ${STATUS_AREA_Y})`}
+              transform={`translate(${operationPosition.x + operationPosition.width / 2}, ${STATUS_AREA_Y + operationPosition.y})`}
               style={{ zIndex: 100 }}
             >
               <rect
@@ -144,26 +149,15 @@ export function Canvas({ step, inputData }: CanvasProps) {
           {/* 指针标注 - 增加状态标识 */}
           {step.pointers?.map((pointer, idx) => {
             const targetX = getCellX(pointer.targetIndex)
-
-            // 如果有多个指针指向同一位置，自动错开 + 允许 stepGenerator 传入额外 offset
-            const sameTargetPointers = step.pointers?.filter((p) => p.targetIndex === pointer.targetIndex) || []
-            const sameTargetIdx = sameTargetPointers.findIndex((p) => p === pointer)
-            const totalSameTarget = sameTargetPointers.length
-
-            const autoXOffset = totalSameTarget > 1 ? (sameTargetIdx - (totalSameTarget - 1) / 2) * 70 : 0
-            const extraXOffset = pointer.offset?.x ?? 0
-            const extraYOffset = pointer.offset?.y ?? 0
-            const pointerCenterX = getLabelCenterX(
-              pointer.targetIndex,
-              pointer.label,
-            ) + autoXOffset + extraXOffset
-
-            const pointerX = pointerCenterX
+            const pointerPosition = pointerPositions[idx]
+            const pointerX = pointerPosition.x + pointerPosition.width / 2
+            const pointerY = ARRAY_Y - POINTER_AREA_HEIGHT / 2 + (pointer.offset?.y ?? 0) + pointerPosition.y
+            const pointerOffsetY = pointerY - (ARRAY_Y - POINTER_AREA_HEIGHT / 2)
 
             return (
               <g
                 key={`pointer-${idx}`}
-                transform={`translate(${pointerCenterX}, ${ARRAY_Y - POINTER_AREA_HEIGHT / 2 + extraYOffset})`}
+                transform={`translate(${pointerX}, ${pointerY})`}
                 style={{ zIndex: 10 }}
               >
                 {/* 指针标签背景 */}
@@ -198,7 +192,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
                   x1={0}
                   y1={8}
                   x2={targetX - pointerX}
-                  y2={POINTER_AREA_HEIGHT / 2 + CELL_HEIGHT / 2 + 4 - extraYOffset}
+                  y2={POINTER_AREA_HEIGHT / 2 + CELL_HEIGHT / 2 + 4 - pointerOffsetY}
                   stroke={pointer.color}
                   strokeWidth={2.5}
                   strokeDasharray="6,3"
@@ -208,7 +202,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
                 {/* 目标位置标记圆点 */}
                 <circle
                   cx={targetX - pointerX}
-                  cy={POINTER_AREA_HEIGHT / 2 + CELL_HEIGHT / 2 - extraYOffset}
+                  cy={POINTER_AREA_HEIGHT / 2 + CELL_HEIGHT / 2 - pointerOffsetY}
                   r={5}
                   fill={pointer.color}
                   opacity={0.8}

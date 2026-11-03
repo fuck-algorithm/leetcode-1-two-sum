@@ -42,6 +42,42 @@ export interface Point {
   y: number
 }
 
+export interface PointerLabelPosition extends Point {
+  width: number
+  height: number
+}
+
+/** Places pointer badges in collision-free rows while keeping them near their cells. */
+export function layoutPointerLabels(
+  targets: number[],
+  labels: string[],
+  minX: number,
+  maxX: number,
+): PointerLabelPosition[] {
+  const placed: PointerLabelPosition[] = []
+  const rowPitch = 24
+  const height = 20
+
+  labels.forEach((label, index) => {
+    const width = label.length * 8 + 16
+    const preferredX = targets[index] ?? minX
+    const candidates = Array.from({ length: placed.length + 1 }, (_, row) => -row * rowPitch)
+    const y = candidates.find((candidateY) => {
+      const left = Math.max(minX, Math.min(maxX - width, preferredX - width / 2))
+      const right = left + width
+      return placed.every((other) => {
+        const separated = right + 8 <= other.x || other.x + other.width + 8 <= left
+          || candidateY + height + 4 <= other.y || other.y + other.height + 4 <= candidateY
+        return separated
+      })
+    }) ?? -placed.length * rowPitch
+    const x = Math.max(minX, Math.min(maxX - width, preferredX - width / 2))
+    placed.push({ x, y, width, height })
+  })
+
+  return placed
+}
+
 export function getArrayCellPosition(index: number): Point {
   return { x: ARRAY_X + index * (CELL_WIDTH + CELL_GAP), y: ARRAY_Y }
 }

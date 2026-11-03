@@ -5,6 +5,7 @@ import {
   CELL_WIDTH,
   getArrayCellPosition,
   getHashMapEntryPosition,
+  HASHMAP_Y,
 } from './canvasLayout'
 
 export interface Point { x: number; y: number }
@@ -15,74 +16,99 @@ export interface ArrowGeometry {
   end: Point
 }
 
-const ARRAY_LANE_Y = ARRAY_Y + CELL_HEIGHT + 42
+const ARRAY_LANE_Y = ARRAY_Y + CELL_HEIGHT + 38
+const HASHMAP_LANE_Y = HASHMAP_Y - 18
 
-/** Route each data flow through whitespace lanes instead of over cells or labels. */
+/** Route data flows through reserved whitespace lanes, never through labels or nodes. */
 export function getArrowGeometry(
   arrow: ArrowConnection,
   calculationX: number,
 ): ArrowGeometry {
-  const arrayAnchor = (index: number): Point => {
-    const cell = getArrayCellPosition(index)
-    return { x: cell.x + CELL_WIDTH / 2, y: cell.y + CELL_HEIGHT + 4 }
+  const arrayCell = (index: number) => getArrayCellPosition(index)
+  const mapCell = (index: number) => getHashMapEntryPosition(index)
+  const arrayCenter = (index: number) => {
+    const cell = arrayCell(index)
+    return { x: cell.x + CELL_WIDTH / 2, y: cell.y + CELL_HEIGHT / 2 }
   }
-  const mapAnchor = (index: number): Point => {
-    const entry = getHashMapEntryPosition(index)
+  const arraySide = (index: number, side: 'left' | 'right'): Point => {
+    const cell = arrayCell(index)
+    return {
+      x: side === 'left' ? cell.x - 4 : cell.x + CELL_WIDTH + 4,
+      y: cell.y + CELL_HEIGHT / 2,
+    }
+  }
+  const mapRight = (index: number): Point => {
+    const entry = mapCell(index)
     return { x: entry.x + CELL_WIDTH + 4, y: entry.y + CELL_HEIGHT / 2 }
   }
-  const calculationLeft = { x: calculationX - 15, y: ARRAY_Y + 35 }
-  const calculationBottom = { x: calculationX + 115, y: ARRAY_Y + 55 }
-  let start: Point
-  let end: Point
-
-  if (arrow.fromType === 'array') start = arrayAnchor(arrow.fromIndex)
-  else if (arrow.fromType === 'hashmap') start = mapAnchor(arrow.fromIndex)
-  else start = calculationBottom
-
-  if (arrow.toType === 'array') end = arrayAnchor(arrow.toIndex)
-  else if (arrow.toType === 'hashmap') end = mapAnchor(arrow.toIndex)
-  else end = calculationLeft
+  const mapLeft = (index: number): Point => {
+    const entry = mapCell(index)
+    return { x: entry.x - 4, y: entry.y + CELL_HEIGHT / 2 }
+  }
+  const calculationLeft = { x: calculationX - 15, y: ARRAY_Y + 25 }
+  const calculationRight = { x: calculationX + 245, y: ARRAY_Y + 25 }
 
   if (arrow.fromType === 'array' && arrow.toType === 'calculation') {
+    const cell = arrayCell(arrow.fromIndex)
+    const start = { x: cell.x + CELL_WIDTH - 5, y: cell.y + CELL_HEIGHT + 4 }
     return {
       start,
       control1: { x: start.x, y: ARRAY_LANE_Y },
-      control2: { x: end.x - 32, y: ARRAY_LANE_Y },
-      end,
+      control2: { x: calculationLeft.x - 40, y: ARRAY_LANE_Y },
+      end: calculationLeft,
     }
   }
 
   if (arrow.fromType === 'array' && arrow.toType === 'hashmap') {
-    const target = getHashMapEntryPosition(arrow.toIndex)
-    const targetCenterY = target.y + CELL_HEIGHT / 2
-    const approachX = target.x + CELL_WIDTH / 2
+    const cell = arrayCell(arrow.fromIndex)
+    const entry = mapCell(arrow.toIndex)
+    const centerX = cell.x + CELL_WIDTH / 2
+    const side = centerX <= entry.x + CELL_WIDTH / 2 ? 'right' : 'left'
+    const start = arraySide(arrow.fromIndex, side)
+    const end = mapRight(arrow.toIndex)
+    const laneY = ARRAY_LANE_Y
     return {
       start,
-      control1: { x: start.x, y: targetCenterY + 18 },
-      control2: { x: approachX, y: targetCenterY + 18 },
-      end: { x: target.x + CELL_WIDTH / 2, y: targetCenterY },
+      control1: { x: start.x + (side === 'right' ? 22 : -22), y: laneY },
+      control2: { x: end.x + 34, y: laneY },
+      end,
     }
   }
 
   if (arrow.fromType === 'calculation' && arrow.toType === 'hashmap') {
-    const target = getHashMapEntryPosition(arrow.toIndex)
-    const targetCenterY = target.y + CELL_HEIGHT / 2
+    const end = mapRight(arrow.toIndex)
     return {
-      start,
-      control1: { x: end.x + 150, y: targetCenterY - 35 },
-      control2: { x: end.x + 30, y: targetCenterY - 35 },
-      end: { x: target.x + CELL_WIDTH + 4, y: targetCenterY },
+      start: calculationRight,
+      control1: { x: calculationRight.x + 40, y: HASHMAP_LANE_Y },
+      control2: { x: end.x + 44, y: HASHMAP_LANE_Y },
+      end,
     }
   }
 
   if (arrow.fromType === 'hashmap' && arrow.toType === 'array') {
+    const start = mapRight(arrow.fromIndex)
+    const cell = arrayCell(arrow.toIndex)
+    const end = arraySide(arrow.toIndex, 'left')
+    const outerRightLane = Math.max(start.x, cell.x + CELL_WIDTH) + 64
+    const upperArrayLane = ARRAY_Y - 25
     return {
       start,
-      control1: { x: start.x + 36, y: ARRAY_LANE_Y + 42 },
-      control2: { x: end.x, y: ARRAY_LANE_Y },
+      control1: { x: outerRightLane, y: start.y },
+      control2: { x: outerRightLane, y: upperArrayLane },
       end,
     }
   }
+
+  const start = arrow.fromType === 'array'
+    ? arrayCenter(arrow.fromIndex)
+    : arrow.fromType === 'hashmap'
+      ? mapRight(arrow.fromIndex)
+      : calculationRight
+  const end = arrow.toType === 'array'
+    ? arrayCenter(arrow.toIndex)
+    : arrow.toType === 'hashmap'
+      ? mapLeft(arrow.toIndex)
+      : calculationLeft
 
   return {
     start,

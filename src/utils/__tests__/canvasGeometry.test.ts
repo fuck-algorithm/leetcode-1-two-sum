@@ -41,7 +41,10 @@ describe('canvas arrow geometry', () => {
       .filter((index) => !(arrow.fromType === 'hashmap' && index === arrow.fromIndex) && !(arrow.toType === 'hashmap' && index === arrow.toIndex))
       .map((index) => ({ ...getHashMapEntryPosition(index), width: CELL_WIDTH, height: CELL_HEIGHT }))
 
-    expect(samples.some((point) => [...unrelatedArray, ...unrelatedMap].some((rect) => intersectsRect(point, rect)))).toBe(false)
+    const collision = samples
+      .map((point) => ({ point, rect: [...unrelatedArray, ...unrelatedMap].find((rect) => intersectsRect(point, rect)) }))
+      .find((sample) => sample.rect)
+    expect(collision).toBeUndefined()
     expect(path.start.x).not.toBe(path.end.x)
   })
 

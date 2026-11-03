@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { getCanvasViewport } from '../canvasViewport'
+import { getSceneBounds } from '../canvasLayout'
 
 describe('getCanvasViewport', () => {
   it.each([
@@ -8,12 +9,9 @@ describe('getCanvasViewport', () => {
     { width: 1400, height: 920 },
   ])('centers the complete scene in a $width × $height viewport', ({ width, height }) => {
     const viewport = getCanvasViewport({ width, height, arrayLength: 4 })
-    const sceneLeft = -65
-    const sceneRight = Math.max(700, 4 * 90 + 340)
-    const sceneTop = 45
-    const sceneBottom = 320 + 3 * 48 + 70 + 45
-    const centerX = viewport.x + ((sceneLeft + sceneRight) / 2) * viewport.scale
-    const centerY = viewport.y + ((sceneTop + sceneBottom) / 2) * viewport.scale
+    const bounds = getSceneBounds(4)
+    const centerX = viewport.x + ((bounds.left + bounds.right) / 2) * viewport.scale
+    const centerY = viewport.y + ((bounds.top + bounds.bottom) / 2) * viewport.scale
 
     expect(centerX).toBeCloseTo(width / 2, 8)
     expect(centerY).toBeCloseTo(height / 2, 8)

@@ -1,3 +1,4 @@
+import { getCalculationX } from './canvasLayout'
 import type {
   Step,
   ArrayElementState,
@@ -9,9 +10,6 @@ import type {
   PointerAnnotation,
 } from '../types'
 
-const CELL_WIDTH = 70
-const CELL_GAP = 20
-const HASHMAP_GAP = 110
 
 export const TWO_SUM_CODE = `public int[] twoSum(int[] nums, int target) {
     Map<Integer, Integer> map = new HashMap<>();
@@ -29,7 +27,7 @@ export const TWO_SUM_CODE = `public int[] twoSum(int[] nums, int target) {
 export function generateSteps(nums: number[], target: number): Step[] {
   const steps: Step[] = []
   const hashMap: HashMapEntry[] = []
-  const arrayWidth = nums.length * (CELL_WIDTH + CELL_GAP) + HASHMAP_GAP
+  const calculationX = getCalculationX(nums.length)
   let index = 0
 
   const add = (params: Omit<CreateStepParams, 'index' | 'nums'>) => {
@@ -75,7 +73,7 @@ export function generateSteps(nums: number[], target: number): Step[] {
         annotations: [],
         actionLabel: `找 ${complement}`,
         pointers,
-        calculation: { expression: `${target} − ${value}`, result: `${complement}`, x: arrayWidth, y: 0 },
+        calculation: { expression: `${target} − ${value}`, result: `${complement}`, x: calculationX, y: 0 },
         arrows: [],
         statusText: '已保存',
       })
@@ -90,7 +88,7 @@ export function generateSteps(nums: number[], target: number): Step[] {
         annotations: [],
         actionLabel: '配对成功',
         pointers,
-        calculation: { expression: `${nums[previousIndex]} + ${value}`, result: `${target}`, x: arrayWidth, y: 0 },
+        calculation: { expression: `${nums[previousIndex]} + ${value}`, result: `${target}`, x: calculationX, y: 0 },
         statusText: `${previousIndex} + ${i} = ${target}`,
       })
 
@@ -107,7 +105,7 @@ export function generateSteps(nums: number[], target: number): Step[] {
           { targetIndex: previousIndex, label: `${previousIndex}`, color: '#8fd5b5' },
           { targetIndex: i, label: `${i}`, color: '#8fd5b5' },
         ],
-        calculation: { expression: `${nums[previousIndex]} + ${value}`, result: `${target} ✓`, x: arrayWidth, y: 0 },
+        calculation: { expression: `${nums[previousIndex]} + ${value}`, result: `${target} ✓`, x: calculationX, y: 0 },
         statusText: '返回下标',
       })
       return steps
@@ -123,7 +121,7 @@ export function generateSteps(nums: number[], target: number): Step[] {
       annotations: [],
       actionLabel: `找 ${complement}`,
       pointers: [{ targetIndex: i, label: `${value}`, color: '#e9b86e' }],
-      calculation: { expression: `${target} − ${value}`, result: `${complement}`, x: arrayWidth, y: 0 },
+      calculation: { expression: `${target} − ${value}`, result: `${complement}`, x: calculationX, y: 0 },
       arrows: [{
         fromType: 'array', fromIndex: i, toType: 'calculation', toIndex: 0,
         label: '', color: '#e9b86e', zIndex: 1,

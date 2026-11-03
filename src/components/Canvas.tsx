@@ -3,14 +3,21 @@ import * as d3 from 'd3'
 import type { CanvasProps, CanvasTransform } from '../types'
 import styles from './Canvas.module.css'
 import { getCanvasViewport } from '../utils/canvasViewport'
+import { getArrowGeometry } from '../utils/canvasGeometry'
+import {
+  getArrayCellPosition,
+  getHashMapEntryPosition,
+  getCalculationX,
+  CELL_WIDTH,
+  CELL_HEIGHT,
+  CELL_GAP,
+  POINTER_AREA_HEIGHT,
+  ARRAY_Y,
+  HASHMAP_Y,
+} from '../utils/canvasLayout'
 
-const CELL_WIDTH = 70
-const CELL_HEIGHT = 55
-const CELL_GAP = 20
-const ARRAY_Y = 220
-const HASHMAP_Y_OFFSET = 320
-const POINTER_AREA_HEIGHT = 80
 const STATUS_AREA_Y = 90
+const LABEL_GAP = 12
 
 export function Canvas({ step, inputData }: CanvasProps) {
   const svgRef = useRef<SVGSVGElement>(null)
@@ -60,7 +67,14 @@ export function Canvas({ step, inputData }: CanvasProps) {
     }
   }, [inputData.nums.length])
 
-  const getCellX = (index: number) => index * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
+  const getCellX = (index: number) => getArrayCellPosition(index).x + CELL_WIDTH / 2
+  const getLabelCenterX = (index: number, label: string) => {
+    const target = getCellX(index)
+    const halfWidth = label.length * 4 + 8
+    const left = -65 + halfWidth + LABEL_GAP
+    const right = inputData.nums.length * (CELL_WIDTH + CELL_GAP) - halfWidth - LABEL_GAP
+    return Math.max(left, Math.min(right, target))
+  }
 
   return (
     <div ref={containerRef} className={styles.container}>
@@ -104,7 +118,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
           {/* 操作名用一个短词，解释留给代码与解说；不要把整段文案塞进画布。 */}
           {step.actionLabel && (
             <g
-              transform={`translate(${Math.max(0, Math.min(inputData.nums.length * (CELL_WIDTH + CELL_GAP) - 150, getCellX(step.highlightedIndices[0] ?? 0)))}, ${STATUS_AREA_Y})`}
+              transform={`translate(${getLabelCenterX(step.highlightedIndices[0] ?? 0, step.actionLabel)}, ${STATUS_AREA_Y})`}
               style={{ zIndex: 100 }}
             >
               <rect
@@ -139,21 +153,17 @@ export function Canvas({ step, inputData }: CanvasProps) {
             const autoXOffset = totalSameTarget > 1 ? (sameTargetIdx - (totalSameTarget - 1) / 2) * 70 : 0
             const extraXOffset = pointer.offset?.x ?? 0
             const extraYOffset = pointer.offset?.y ?? 0
-            const labelHalfWidth = pointer.label.length * 4 + 8
-            const pointerCenterX = Math.max(
-              labelHalfWidth + 4,
-              Math.min(
-                inputData.nums.length * (CELL_WIDTH + CELL_GAP) - labelHalfWidth - 4,
-                targetX + autoXOffset + extraXOffset,
-              ),
-            )
+            const pointerCenterX = getLabelCenterX(
+              pointer.targetIndex,
+              pointer.label,
+            ) + autoXOffset + extraXOffset
 
             const pointerX = pointerCenterX
 
             return (
               <g
                 key={`pointer-${idx}`}
-                transform={`translate(${pointerX}, ${ARRAY_Y - POINTER_AREA_HEIGHT / 2 + extraYOffset})`}
+                transform={`translate(${pointerCenterX}, ${ARRAY_Y - POINTER_AREA_HEIGHT / 2 + extraYOffset})`}
                 style={{ zIndex: 10 }}
               >
                 {/* 指针标签背景 */}
@@ -210,11 +220,11 @@ export function Canvas({ step, inputData }: CanvasProps) {
 
           {/* 数组元素 - 增加状态标识 */}
           {step.arrayState.map((element, index) => {
-            const x = index * (CELL_WIDTH + CELL_GAP)
+            const x = getArrayCellPosition(index).x
             const isHighlighted = element.isHighlighted
 
             return (
-              <g key={index} transform={`translate(${x}, ${ARRAY_Y})`}>
+              <g key={index} transform={`translate(${x}, ${getArrayCellPosition(index).y})`}>
                 {/* 高亮元素的光晕效果 */}
                 {isHighlighted && (
                   <rect
@@ -269,7 +279,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
           {step.calculation && step.scene !== 'write' && (
             <g
               className={styles.calculationLayer}
-              transform={`translate(${step.calculation.x}, ${ARRAY_Y - 10})`}
+              transform={`translate(${getCalculationX(inputData.nums.length)}, ${ARRAY_Y - 10})`}
               style={{ zIndex: 5 }}
             >
               <rect
@@ -296,32 +306,13 @@ export function Canvas({ step, inputData }: CanvasProps) {
             ?.slice()
             .sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
             .map((arrow, idx) => {
-            let x1 = 0, y1 = 0, x2 = 0, y2 = 0
-
-            // 计算起点位置（箭头从这里开始）
-            if (arrow.fromType === 'array') {
-              x1 = arrow.fromIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y1 = ARRAY_Y + CELL_HEIGHT + 5
-            } else if (arrow.fromType === 'hashmap') {
-              x1 = arrow.fromIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y1 = HASHMAP_Y_OFFSET + CELL_HEIGHT / 2
-            } else if (arrow.fromType === 'calculation') {
-              // Calculation 右侧边缘是数据流出口，按行错开多个来源。
-              x1 = (step.calculation?.x ?? 0) + 265
-              y1 = (step.calculation?.y ?? 0) + ARRAY_Y + 10 + (arrow.fromIndex ?? 0) * 22
-            }
-
-            // 计算终点位置（箭头指向这里）
-            if (arrow.toType === 'hashmap') {
-              x2 = arrow.toIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y2 = HASHMAP_Y_OFFSET + CELL_HEIGHT / 2
-            } else if (arrow.toType === 'array') {
-              x2 = arrow.toIndex * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2
-              y2 = ARRAY_Y + CELL_HEIGHT + 5
-            } else if (arrow.toType === 'calculation') {
-              x2 = (step.calculation?.x ?? 0) - 15
-              y2 = (step.calculation?.y ?? 0) + ARRAY_Y + 10 + (arrow.toIndex ?? 0) * 22
-            }
+            const calculationX = getCalculationX(inputData.nums.length)
+            const geometry = getArrowGeometry(arrow, calculationX)
+            const { start, control1, control2, end } = geometry
+            const x1 = start.x
+            const y1 = start.y
+            const x2 = end.x
+            const y2 = end.y
 
             const markerId =
               arrow.color === '#4caf50'
@@ -330,31 +321,21 @@ export function Canvas({ step, inputData }: CanvasProps) {
                   ? 'arrowhead-blue'
                   : 'arrowhead'
 
-            const isGoingUp = y1 > y2
-            const isGoingRight = x2 > x1
-            const isGoingLeft = x2 < x1
-            const isVerticalFlow = arrow.fromType === 'hashmap' || arrow.toType === 'hashmap'
-            const controlOffset = Math.max(36, Math.abs(y2 - y1) * 0.42)
-            // Keep transfer arrows in a vertical lane between the source and destination.
-            const controlX1 = isVerticalFlow
-              ? x1 + (x2 - x1) * 0.15
-              : x1 + (arrow.fromType === 'calculation' ? 64 : isGoingRight ? 50 : -50)
-            const controlX2 = isVerticalFlow
-              ? x1 + (x2 - x1) * 0.85
-              : x2 + (arrow.toType === 'calculation' ? -64 : isGoingLeft ? -50 : 50)
-            const controlY1 = isVerticalFlow
-              ? y1 + (y2 - y1) * 0.35
-              : y1 + (isGoingUp ? -controlOffset : controlOffset)
-            const controlY2 = isVerticalFlow
-              ? y1 + (y2 - y1) * 0.65
-              : y2 + (isGoingUp ? controlOffset : -controlOffset)
+            const controlX1 = control1.x
+            const controlY1 = control1.y
+            const controlX2 = control2.x
+            const controlY2 = control2.y
             const baseLabelX = (x1 + 3 * controlX1 + 3 * controlX2 + x2) / 8
-            const baseLabelY = (y1 + 3 * controlY1 + 3 * controlY2 + y2) / 8 - 42
+            const baseLabelY = (y1 + 3 * controlY1 + 3 * controlY2 + y2) / 8 - 30
             const labelX = baseLabelX + (arrow.labelOffset?.x ?? 0)
             const labelY = baseLabelY + (arrow.labelOffset?.y ?? 0)
 
             return (
-              <g key={`arrow-${idx}`} style={{ zIndex: arrow.zIndex ?? 0 }}>
+              <g
+                key={`arrow-${idx}`}
+                style={{ zIndex: arrow.zIndex ?? 0 }}
+                data-arrow-kind={`${arrow.fromType}-${arrow.toType}`}
+              >
                 {/* 起点标记圆点 */}
                 <circle
                   cx={x1}
@@ -434,14 +415,14 @@ export function Canvas({ step, inputData }: CanvasProps) {
 
           {/* 已看过的数字是后续配对的查找表。 */}
           {step.hashMapState.length > 0 && (
-            <text x={0} y={HASHMAP_Y_OFFSET - 25} className={styles.sectionTitle}>
+            <text x={0} y={HASHMAP_Y - 25} className={styles.sectionTitle}>
               已记住
             </text>
           )}
 
           {/* HashMap 条目 - 增加状态标识 */}
           {step.hashMapState.length === 0 ? (
-            <g transform={`translate(0, ${HASHMAP_Y_OFFSET + 25})`}>
+            <g transform={`translate(0, ${HASHMAP_Y + 25})`}>
               <rect
                 x={-10}
                 y={-18}
@@ -459,10 +440,10 @@ export function Canvas({ step, inputData }: CanvasProps) {
             </g>
           ) : (
             step.hashMapState.map((entry, index) => {
-              const x = index * (CELL_WIDTH + CELL_GAP)
+              const position = getHashMapEntryPosition(index)
 
               return (
-                <g key={index} transform={`translate(${x}, ${HASHMAP_Y_OFFSET + index * 48})`} className={entry.isNew ? styles.hashEntryNew : styles.hashEntry}>
+                <g key={index} transform={`translate(${position.x}, ${position.y})`} className={entry.isNew ? styles.hashEntryNew : styles.hashEntry}>
                   {entry.isNew && (
                     <path
                       d={`M ${CELL_WIDTH / 2} -58 C ${CELL_WIDTH / 2} -42, ${CELL_WIDTH / 2} -24, ${CELL_WIDTH / 2} -4`}

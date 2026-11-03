@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ArrowConnection } from '../../types'
-import { getArrowGeometry } from '../canvasGeometry'
+import { getArrowGeometry, getArrowLabelLayout } from '../canvasGeometry'
 import {
   ARRAY_Y,
   CELL_HEIGHT,
@@ -46,6 +46,29 @@ describe('canvas arrow geometry', () => {
       .find((sample) => sample.rect)
     expect(collision).toBeUndefined()
     expect(path.start.x).not.toBe(path.end.x)
+  })
+
+  it('keeps short arrow captions out of the calculation card and array cells', () => {
+    const geometry = getArrowGeometry({ fromType: 'array', fromIndex: 1, toType: 'calculation', toIndex: 0 }, 470)
+    const label = getArrowLabelLayout(geometry, '还差 2', 470, 4)
+    const calculationCard = { x: 455, y: ARRAY_Y - 35, width: 260, height: 90 }
+    const cell = { ...getArrayCellPosition(1), width: CELL_WIDTH, height: CELL_HEIGHT }
+
+    expect(intersectsRect(label, calculationCard)).toBe(false)
+    expect(intersectsRect(label, cell)).toBe(false)
+  })
+
+  it('keeps adjacent arrow captions from colliding', () => {
+    const first = getArrowGeometry({ fromType: 'array', fromIndex: 0, toType: 'calculation', toIndex: 0 }, 470)
+    const second = getArrowGeometry({ fromType: 'array', fromIndex: 1, toType: 'calculation', toIndex: 1 }, 470)
+    const firstLabel = getArrowLabelLayout(first, '还差 7', 470, 4)
+    const secondLabel = getArrowLabelLayout(second, '还差 2', 470, 4, [firstLabel])
+    const overlaps = firstLabel.x < secondLabel.x + secondLabel.width + 5 &&
+      firstLabel.x + firstLabel.width + 5 > secondLabel.x &&
+      firstLabel.y < secondLabel.y + secondLabel.height + 5 &&
+      firstLabel.y + firstLabel.height + 5 > secondLabel.y
+
+    expect(overlaps).toBe(false)
   })
 
   it('anchors array arrows at the cell edge and hashmap arrows at the card edge', () => {

@@ -16,8 +16,15 @@ export interface ArrowGeometry {
   end: Point
 }
 
+export interface ArrowLabelLayout extends Point {
+  width: number
+  height: number
+}
+
 const ARRAY_LANE_Y = ARRAY_Y + CELL_HEIGHT + 38
 const HASHMAP_LANE_Y = HASHMAP_Y - 18
+const CARD_LABEL_GAP = 14
+const LABEL_ROW_GAP = 5
 
 /** Route data flows through reserved whitespace lanes, never through labels or nodes. */
 export function getArrowGeometry(
@@ -115,5 +122,59 @@ export function getArrowGeometry(
     control1: { x: start.x + (end.x - start.x) * 0.35, y: start.y + (end.y - start.y) * 0.35 },
     control2: { x: start.x + (end.x - start.x) * 0.65, y: start.y + (end.y - start.y) * 0.65 },
     end,
+  }
+}
+
+/** Places an arrow's short label on a free section of its route, outside both cards. */
+export function getArrowLabelLayout(
+  geometry: ArrowGeometry,
+  text: string,
+  calculationX: number,
+  arrayLength: number,
+  occupied: ArrowLabelLayout[] = [],
+): ArrowLabelLayout {
+  const width = Math.max(28, text.length * 7 + 14)
+  const height = 22
+  const start = geometry.start
+  const end = geometry.end
+  const candidates: Point[] = []
+  const cardTop = ARRAY_Y - 35
+  const cardBottom = ARRAY_Y + 72
+  const arrayRight = arrayLength * (CELL_WIDTH + 20)
+  const leftOfCalculation = calculationX - width - CARD_LABEL_GAP
+  const routeMidX = (start.x + end.x) / 2
+  const cardBottomLane = cardBottom + 12
+  const hashHeaderLane = HASHMAP_Y - 28 - height - 8
+
+  const firstLaneY = ARRAY_LANE_Y + 16
+  const secondLaneY = HASHMAP_Y - height - 16
+  const laneXs = end.x >= start.x
+    ? [leftOfCalculation, routeMidX - width / 2, arrayRight * 0.45 - width / 2]
+    : [routeMidX - width / 2, calculationX * 0.35 - width / 2, arrayRight * 0.45 - width / 2]
+  for (const x of laneXs) candidates.push({ x, y: cardBottomLane }, { x, y: hashHeaderLane })
+  for (const y of [firstLaneY, secondLaneY, ARRAY_LANE_Y + 44]) {
+    for (const x of laneXs) candidates.push({ x, y })
+  }
+
+  const clampX = (x: number) => Math.max(8, Math.min(arrayRight - width - 8, x))
+  const clampY = (y: number) => Math.max(ARRAY_Y - 78, Math.min(HASHMAP_Y - height - 12, y))
+  const overlaps = (candidate: ArrowLabelLayout) => occupied.some((other) =>
+    candidate.x < other.x + other.width + LABEL_ROW_GAP &&
+    candidate.x + candidate.width + LABEL_ROW_GAP > other.x &&
+    candidate.y < other.y + other.height + LABEL_ROW_GAP &&
+    candidate.y + candidate.height + LABEL_ROW_GAP > other.y,
+  )
+
+  for (const candidate of candidates) {
+    const layout = { x: clampX(candidate.x), y: clampY(candidate.y), width, height }
+    const outsideCards = layout.y + height < cardTop || layout.y > cardBottom
+    if (outsideCards && !overlaps(layout)) return layout
+  }
+
+  return {
+    x: clampX((start.x + end.x) / 2 - width / 2),
+    y: clampY(ARRAY_LANE_Y + 18),
+    width,
+    height,
   }
 }

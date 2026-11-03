@@ -74,7 +74,10 @@ export function generateSteps(nums: number[], target: number): Step[] {
         actionLabel: `找 ${complement}`,
         pointers,
         calculation: { expression: `${target} − ${value}`, result: `${complement}`, x: calculationX, y: 0 },
-        arrows: [],
+        arrows: [{
+          fromType: 'calculation', fromIndex: 0, toType: 'hashmap', toIndex: matchIndex,
+          label: `命中 ${complement}`, color: '#8fd5b5', zIndex: 2,
+        }],
         statusText: '已保存',
       })
 
@@ -124,7 +127,7 @@ export function generateSteps(nums: number[], target: number): Step[] {
       calculation: { expression: `${target} − ${value}`, result: `${complement}`, x: calculationX, y: 0 },
       arrows: [{
         fromType: 'array', fromIndex: i, toType: 'calculation', toIndex: 0,
-        label: '', color: '#e9b86e', zIndex: 1,
+        label: `还差 ${complement}`, color: '#e9b86e', zIndex: 1,
       }],
       statusText: '还没找到',
     })
@@ -145,7 +148,7 @@ export function generateSteps(nums: number[], target: number): Step[] {
       pointers: [{ targetIndex: i, label: `${value}`, color: '#8fd5b5' }],
       arrows: [{
         fromType: 'array', fromIndex: i, toType: 'hashmap', toIndex: hashMap.length - 1,
-        label: '', color: '#8fd5b5', zIndex: 2,
+        label: `记住 ${value}`, color: '#8fd5b5', zIndex: 2,
       }],
       statusText: `位置 ${i}`,
     })

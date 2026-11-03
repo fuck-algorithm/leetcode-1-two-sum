@@ -3,7 +3,7 @@ import * as d3 from 'd3'
 import type { CanvasProps, CanvasTransform } from '../types'
 import styles from './Canvas.module.css'
 import { getCanvasViewport } from '../utils/canvasViewport'
-import { getArrowGeometry } from '../utils/canvasGeometry'
+import { getArrowGeometry, getArrowLabelLayout, type ArrowLabelLayout } from '../utils/canvasGeometry'
 import {
   getArrayCellPosition,
   getHashMapEntryPosition,
@@ -296,41 +296,40 @@ export function Canvas({ step, inputData }: CanvasProps) {
           </g>
 
           {/* 箭头连接 */}
-          {step.arrows
-            ?.slice()
-            .sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
-            .map((arrow, idx) => {
+          {(() => {
+            const occupiedLabels: ArrowLabelLayout[] = []
             const calculationX = getCalculationX(inputData.nums.length)
-            const geometry = getArrowGeometry(arrow, calculationX)
-            const { start, control1, control2, end } = geometry
-            const x1 = start.x
-            const y1 = start.y
-            const x2 = end.x
-            const y2 = end.y
-
-            const markerId =
-              arrow.color === '#4caf50'
+            return step.arrows
+              ?.slice()
+              .sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
+              .map((arrow, idx) => {
+              const geometry = getArrowGeometry(arrow, calculationX)
+              const { start, control1, control2, end } = geometry
+              const controlX1 = control1.x
+              const controlY1 = control1.y
+              const controlX2 = control2.x
+              const controlY2 = control2.y
+              const x1 = start.x
+              const y1 = start.y
+              const x2 = end.x
+              const y2 = end.y
+              const markerId = arrow.color === '#4caf50'
                 ? 'arrowhead-green'
                 : arrow.color === '#2196f3'
                   ? 'arrowhead-blue'
                   : 'arrowhead'
+              const labelLayout = arrow.label
+                ? getArrowLabelLayout(geometry, arrow.label, calculationX, inputData.nums.length, occupiedLabels)
+                : null
+              if (labelLayout) occupiedLabels.push(labelLayout)
 
-            const controlX1 = control1.x
-            const controlY1 = control1.y
-            const controlX2 = control2.x
-            const controlY2 = control2.y
-            const baseLabelX = (x1 + 3 * controlX1 + 3 * controlX2 + x2) / 8
-            const baseLabelY = (y1 + 3 * controlY1 + 3 * controlY2 + y2) / 8 - 30
-            const labelX = baseLabelX + (arrow.labelOffset?.x ?? 0)
-            const labelY = baseLabelY + (arrow.labelOffset?.y ?? 0)
-
-            return (
-              <g
-                key={`arrow-${idx}`}
-                style={{ zIndex: arrow.zIndex ?? 0 }}
-                data-arrow-kind={`${arrow.fromType}-${arrow.toType}`}
-              >
-                {/* 起点标记圆点 */}
+              return (
+                <g
+                  key={`arrow-${idx}`}
+                  style={{ zIndex: arrow.zIndex ?? 0 }}
+                  data-arrow-kind={`${arrow.fromType}-${arrow.toType}`}
+                >
+                  {/* 起点标记圆点 */}
                 <circle
                   cx={x1}
                   cy={y1}
@@ -349,7 +348,7 @@ export function Canvas({ step, inputData }: CanvasProps) {
                   className={styles.arrow}
                 />
                 
-                {/* 流动动画路径 - 使用虚线模拟数据流动 */}
+                {/* 沿箭头移动的短虚线表示数据正在传递。 */}
                 <path
                   d={`M ${x1} ${y1} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${x2} ${y2}`}
                   fill="none"
@@ -361,51 +360,33 @@ export function Canvas({ step, inputData }: CanvasProps) {
                 />
                 
                 {/* 箭头标签 */}
-                {arrow.label && (
-                  <g transform={`translate(${labelX}, ${labelY})`}>
-                    {/* 标签背景 - 增加阴影和边框效果 */}
+                {arrow.label && labelLayout && (
+                  <g transform={`translate(${labelLayout.x}, ${labelLayout.y})`}>
                     <rect
-                      x={-8}
-                      y={-16}
-                      width={arrow.label.length * 8 + 20}
-                      height={28}
-                      rx={6}
-                      fill="rgba(0,0,0,0.95)"
-                      stroke={arrow.color || '#ffeb3b'}
-                      strokeWidth={2}
+                      x={0}
+                      y={0}
+                      width={labelLayout.width}
+                      height={labelLayout.height}
+                      rx={11}
+                      fill="#132329"
+                      stroke={arrow.color || '#8fd5b5'}
+                      strokeWidth={1.2}
                       className={styles.arrowLabelBg}
                     />
-                    {/* 标签阴影效果 */}
-                    <rect
-                      x={-8}
-                      y={-16}
-                      width={arrow.label.length * 8 + 20}
-                      height={28}
-                      rx={6}
-                      fill={arrow.color || '#ffeb3b'}
-                      opacity={0.1}
-                      transform="translate(0, 2)"
-                    />
-                    {/* 标签文本 */}
                     <text
-                      x={arrow.label.length * 4 + 2}
-                      y={4}
+                      x={labelLayout.width / 2}
+                      y={labelLayout.height / 2}
                       className={styles.arrowLabel}
-                      style={{ fill: arrow.color || '#ffeb3b' }}
+                      style={{ fill: arrow.color || '#8fd5b5' }}
                     >
                       {arrow.label}
                     </text>
-                    {/* 标签装饰 - 小三角形指示方向 */}
-                    <path
-                      d="M -12 0 L -18 -4 L -18 4 Z"
-                      fill={arrow.color || '#ffeb3b'}
-                      opacity={0.6}
-                    />
                   </g>
                 )}
-              </g>
-            )
-          })}
+                </g>
+              )
+              })
+          })()}
 
           {/* 已看过的数字是后续配对的查找表。 */}
           {step.hashMapState.length > 0 && (
